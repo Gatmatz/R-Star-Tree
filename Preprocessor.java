@@ -52,7 +52,7 @@ public class Preprocessor {
                 {
                     Element eElement = (Element) nNode;
                     String line = eElement.getAttribute("id")+','+eElement.getAttribute("lat")+','+eElement.getAttribute("lon");
-                    myWriter.write(line+'\n');
+                    myWriter.write(line+ "\n");
                 }
             }
 
