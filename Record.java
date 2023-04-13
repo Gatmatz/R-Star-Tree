@@ -9,9 +9,7 @@ public class Record implements Serializable{
     public Record(long id, ArrayList<Double> cor){
         this.id=id;
         coordinates=new ArrayList<>();
-        for (Double s: cor) {
-            coordinates.add(s);
-        }
+        coordinates.addAll(cor);
     }
 
     public void printIt(){

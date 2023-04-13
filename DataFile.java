@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class DataFile {
-    public ArrayList<Double> coordinates;
     public ArrayList<Record> records=new ArrayList<>();
-
 
     DataFile(){
     }
@@ -30,7 +28,7 @@ public class DataFile {
             long id=0;
             if (counter>0){
                 boolean flag=false;
-                coordinates= new ArrayList<>();
+                ArrayList<Double> coordinates= new ArrayList<>();
                 for (String c : nodeArray) {
                     if (!flag){
                         id = Long.parseLong(c);
