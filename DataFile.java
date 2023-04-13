@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class DataFile {
-    public ArrayList<Record> records;
+    public ArrayList<Double> coordinates;
+    public ArrayList<Record> records=new ArrayList<>();
 
 
     DataFile(){
@@ -18,46 +19,47 @@ public class DataFile {
         //Set delimiter to suit CSD form
         String delimiter = ",|\n";
         //Parse through the lines
-        while (parser.hasNextLine())
-        {
+        long counter=0;
+        while (parser.hasNextLine()) {
             //Get a specific node
             String node = parser.nextLine();
             //Break node into the id and coordinates
             String[] nodeArray = node.split(delimiter);
-            //Get node id
-            //String id = nodeArray[0];
 
-            //Get coordinates
-            int position=0;
-            boolean flag=false;
-            String  id="" , lat="", lon="";
-            for (String c : nodeArray) {
-                if (position==0) {
-                    id = c;
-                    position++;
-                }else if (position==1) {
-                    lat = c;
-                    position++;
-                }else {
-                    lon = c;
-                    position = 0;
-                    flag=true;
+            //Get node id and coordinates
+            long id=0;
+            if (counter>0){
+                boolean flag=false;
+                coordinates= new ArrayList<>();
+                for (String c : nodeArray) {
+                    if (!flag){
+                        id = Long.parseLong(c);
+                        flag=true;
+                    }else{
+                        Double coordinate=Double.parseDouble(c);
+                        coordinates.add(coordinate);
+                    }
                 }
-                if (flag) {
-                    Record a=new Record(id, lat, lon);
-                    records.add(a);
-                    flag = false;
-                }
+                Record a=new Record(id,coordinates);
+                records.add(a);
             }
+            counter++;
         }
-
         //Close file after finishing reading
         parser.close();
+    }
+
+    public void printRecords(){
+        for (Record r:records){
+            r.printIt();
+        }
+        System.out.println("I have " + records.size()+ " records.");
     }
 
     public static void main(String[] args) throws FileNotFoundException {
         String path = "data/small_processed.csv";
         DataFile df= new DataFile();
         df.readCSV(path);
+        df.printRecords();
     }
 }
