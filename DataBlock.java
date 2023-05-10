@@ -3,9 +3,9 @@ import java.util.ArrayList;
 
 public class DataBlock implements Serializable
 {
-    public long blockId;
+    public int blockId;
     public ArrayList<Record> records;
-    public DataBlock(long blockId)
+    public DataBlock(int blockId)
     {
         this.blockId=blockId;
         records=new ArrayList<>();
