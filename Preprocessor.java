@@ -47,8 +47,8 @@ public class Preprocessor {
 
             //Iterate through nodes and write the needed attributes of node in the csv file
             for (int i = 0; i < nodeList.getLength(); i++) {
-                Node nNode = nodeList.item(i);
-                if (nNode.getNodeType() == Node.ELEMENT_NODE)
+                org.w3c.dom.Node nNode = nodeList.item(i);
+                if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE)
                 {
                     Element eElement = (Element) nNode;
                     String line = eElement.getAttribute("id")+','+eElement.getAttribute("lat")+','+eElement.getAttribute("lon");

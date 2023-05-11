@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class DataFile {
     public final String csvPath;
     public final String dataFilePath;
+    public static int nofCoordinates;
     public ArrayList<Record> records=new ArrayList<>();
     public final int BLOCK_SIZE =  32 * 1024;
     private int actualBlockSize;
@@ -29,6 +30,14 @@ public class DataFile {
         this.createBlocks(); //Create datafile and return the real size of block in memory
     }
 
+    /**
+     * Getter function that returns the number of parameters used in program.
+     * @return number of parameters.
+     */
+    public static int getNofCoordinates()
+    {
+        return nofCoordinates;
+    }
     /**
      * Basic function that reads the CSV file and keeps the records to an ArrayList.
      */
@@ -66,6 +75,8 @@ public class DataFile {
                 Record nRec=new Record(id,coordinates);
                 //Find record size from first record read
                 records.add(nRec);
+                //Set number of coordinates
+                nofCoordinates = coordinates.size();
             }
             counter++;
         }
