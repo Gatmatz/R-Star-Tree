@@ -8,6 +8,9 @@ public class Main {
         String dataFilePath = "files/datafile.txt";
         DataFile df= new DataFile(csvPath,dataFilePath);
         df.createDatafile();
+        LinearNearestNeighbours a=new LinearNearestNeighbours(3, 40.0, 25.0);
+        a.create();
+
     }
 
     public void testNodeEntry()

@@ -7,14 +7,15 @@ import java.util.Scanner;
 
 public class DataFile {
     public final String csvPath;
-    public final String dataFilePath;
+    public static String dataFilePath;
     public static int nofCoordinates;
-    public ArrayList<Record> records=new ArrayList<>();
-    public final int BLOCK_SIZE =  32 * 1024;
-    private int actualBlockSize;
-    private int RECORD_SIZE;
-    private int offset;
+    public static ArrayList<Record> records=new ArrayList<>();
+    public static final int BLOCK_SIZE =  32 * 1024;
+    private static int actualBlockSize;
+    private static int RECORD_SIZE;
+    private static int offset;
     RandomAccessFile dataFile;
+
     DataFile(String csvPath, String dataFilePath) throws IOException
     {
         this.csvPath = csvPath;
@@ -101,7 +102,7 @@ public class DataFile {
      * @param nblock Object class to be deserialized
      * @return byte array of the deserialized object
      */
-    private Object deserializeObject(byte[] nblock) throws IOException, ClassNotFoundException {
+    private static Object deserializeObject(byte[] nblock) throws IOException, ClassNotFoundException {
         ByteArrayInputStream objectStream = new ByteArrayInputStream(nblock);
         ObjectInputStream object = new ObjectInputStream(objectStream);
         return object.readObject();
@@ -213,7 +214,7 @@ public class DataFile {
      * @param blockId number of block that will be fetched.
      * @return DataBlock Object with blockid the given argument.
      */
-    private DataBlock readDataFileBlock(int blockId)
+    public static DataBlock readDataFileBlock(int blockId)
     {
         //Check if block exists
         int numofBlocks = (int)Math.ceil((float)(RECORD_SIZE*records.size())/BLOCK_SIZE);
@@ -251,7 +252,7 @@ public class DataFile {
      * Basic function that returns all Blocks of a Datafile as an ArrayList.
      * @return an ArrayList that contains all blocks of datafile
      */
-    public ArrayList<DataBlock> getBlocks()
+    public  ArrayList<DataBlock> getBlocks()
     {
         //Calculate number of blocks to be fetched
         int nofBlocks = (int)Math.ceil((float)(RECORD_SIZE*records.size())/BLOCK_SIZE);
