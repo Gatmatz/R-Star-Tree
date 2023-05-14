@@ -29,9 +29,10 @@ public class Record implements Serializable{
         System.out.println("");
     }
 
-
-    public static void main(String[] args) {
-
-    }
+    /**
+     * Gets the id of a specific record.
+     * @return long record ID.
+     */
+    public long getId() {return id;}
 
 }

@@ -6,7 +6,8 @@ public class PrintThemAll {
      * Function that executes all queries and then prints out the time results.
      */
     public void all(){
-        LinearNearestNeighbours();
+        //LinearNearestNeighbours();
+        LinearRangeQueryRadius();
     }
 
     /**
@@ -17,6 +18,19 @@ public class PrintThemAll {
         pointCoordinates.add(40.0);
         pointCoordinates.add(25.0);
         LinearNearestNeighbours a=new LinearNearestNeighbours(1000, pointCoordinates);
+        long startTime=System.nanoTime();
+        a.create();
+        long endTime = System.nanoTime();
+        double execution=(double) (endTime - startTime) / 1000000;
+        a.print();
+        System.out.println("Execution time: " + execution + " milliseconds");
+    }
+
+    public void LinearRangeQueryRadius(){
+        ArrayList<Double> pointCoordinates= new ArrayList<>();
+        pointCoordinates.add(40.0);
+        pointCoordinates.add(25.0);
+        LinearRangeQueryRadius a=new LinearRangeQueryRadius(1.0, pointCoordinates);
         long startTime=System.nanoTime();
         a.create();
         long endTime = System.nanoTime();

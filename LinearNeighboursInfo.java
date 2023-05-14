@@ -1,4 +1,4 @@
-public class NeighboursInfo {
+public class LinearNeighboursInfo {
     public long recordId;
     public double distance;
 
@@ -8,7 +8,7 @@ public class NeighboursInfo {
      * @param recordId record ID.
      * @param distance the distance of two points.
      */
-    NeighboursInfo(long recordId, double distance){
+    LinearNeighboursInfo(long recordId, double distance){
         this.recordId=recordId;
         this.distance=distance;
     }

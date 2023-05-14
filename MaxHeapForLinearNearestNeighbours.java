@@ -1,22 +1,22 @@
 import java.util.ArrayList;
 
-public class MaxHeap {
+public class MaxHeapForLinearNearestNeighbours {
     private double[] Heap;
     private int size;
     private int maxsize;
-    public ArrayList<NeighboursInfo> nearestNeighbours;
+    public ArrayList<LinearNeighboursInfo> nearestNeighbours;
 
 
     /**
      * Constructor to initialize an empty max heap with given maximum capacity.
      */
-    public MaxHeap(ArrayList<NeighboursInfo> nearest, int maxsize)
+    public MaxHeapForLinearNearestNeighbours(ArrayList<LinearNeighboursInfo> nearest, int maxsize)
     {
         // This keyword refers to current instance itself
         this.maxsize = maxsize;
         this.size = 0;
         Heap = new double[this.maxsize];
-        for (NeighboursInfo a: nearest){
+        for (LinearNeighboursInfo a: nearest){
             insert(a.distance);
         }
         nearestNeighbours=new ArrayList<>();
@@ -64,7 +64,7 @@ public class MaxHeap {
      * @param neighbour the point I want to insert to nearestNeighbours.
      * @return the renewed ArrayList nearestNeighbours.
      */
-    public ArrayList<NeighboursInfo> findMax(NeighboursInfo neighbour)
+    public ArrayList<LinearNeighboursInfo> findMax(LinearNeighboursInfo neighbour)
     {
         double popped = Heap[0];
         if (popped>neighbour.getDistance()) {

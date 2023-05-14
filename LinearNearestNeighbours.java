@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public class LinearNearestNeighbours implements Serializable {
     public int k;
     public ArrayList<Double> searchPoint;
-    public ArrayList<NeighboursInfo> nearestNeighbours;
+    public ArrayList<LinearNeighboursInfo> nearestNeighbours;
 
     /**
      * Τhe constructor of a point whose k nearest neighbors I want to find.
@@ -36,12 +36,12 @@ public class LinearNearestNeighbours implements Serializable {
             if (recordsInBlock != null) {
                 for (Record record : recordsInBlock) {
                     double distance=calculateDistanceFromPoint(record,searchPoint);
-                    NeighboursInfo neighbour=new NeighboursInfo(record.id, distance);
+                    LinearNeighboursInfo neighbour=new LinearNeighboursInfo(record.id, distance);
                     counter++;
                     if (counter<=k){
                         nearestNeighbours.add(neighbour);
                     }else{
-                        MaxHeap max= new MaxHeap(nearestNeighbours,k);
+                        MaxHeapForLinearNearestNeighbours max= new MaxHeapForLinearNearestNeighbours(nearestNeighbours,k);
                         nearestNeighbours= max.findMax(neighbour);
                     }
                 }
@@ -55,7 +55,7 @@ public class LinearNearestNeighbours implements Serializable {
      * Prints k nearest neighbors.
      */
     public void print(){
-        for (NeighboursInfo a:nearestNeighbours){
+        for (LinearNeighboursInfo a:nearestNeighbours){
             System.out.println("id="+a.getRecordId()+" distance="+ a.getDistance());
         }
     }
@@ -67,11 +67,10 @@ public class LinearNearestNeighbours implements Serializable {
      * @return double distance between search point and record point.
      */
     public double calculateDistanceFromPoint(Record a, ArrayList<Double> p){
-        int i=0;
         double dist=0;
-        for (Double coordinate: p){
+        int size=DataFile.getNofCoordinates();
+        for (int i=0;i<size;i++){
             dist+=(p.get(i)-a.coordinates.get(i))*(p.get(i)-a.coordinates.get(i));
-            i++;
         }
         //System.out.println("id="+a.id+" distance="+dist);
         return Math.sqrt(dist);
