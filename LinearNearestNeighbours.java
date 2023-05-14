@@ -9,14 +9,11 @@ public class LinearNearestNeighbours implements Serializable {
     /**
      * Τhe constructor of a point whose k nearest neighbors I want to find.
      * @param k int k nearest neighbours.
-     * @param x double coordinate x of the search point.
-     * @param y double coordinate y of the search point.
+     * @param coordinates search point's coordinates
      */
-    LinearNearestNeighbours(int k, double x, double y){
+    LinearNearestNeighbours(int k, ArrayList<Double> coordinates){
         this.k=k;
-        searchPoint=new ArrayList<>();
-        searchPoint.add(x);
-        searchPoint.add(y);
+        searchPoint=new ArrayList<>(coordinates);
         nearestNeighbours=new ArrayList<>();
     }
 
@@ -70,9 +67,14 @@ public class LinearNearestNeighbours implements Serializable {
      * @return double distance between search point and record point.
      */
     public double calculateDistanceFromPoint(Record a, ArrayList<Double> p){
-        double dist=Math.sqrt((p.get(0)-a.coordinates.get(0))*(p.get(0)-a.coordinates.get(0)) + (p.get(1)-a.coordinates.get(1))*(p.get(1)-a.coordinates.get(1)));
+        int i=0;
+        double dist=0;
+        for (Double coordinate: p){
+            dist+=(p.get(i)-a.coordinates.get(i))*(p.get(i)-a.coordinates.get(i));
+            i++;
+        }
         //System.out.println("id="+a.id+" distance="+dist);
-        return dist;
+        return Math.sqrt(dist);
     }
 
 }
