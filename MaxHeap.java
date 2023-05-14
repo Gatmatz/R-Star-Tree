@@ -24,28 +24,16 @@ public class MaxHeap {
 
     }
 
-    // Returning position of parent
+    /**
+     * Returning position of parent
+     */
     private int parent(int pos) { return (pos - 1) / 2; }
 
-    // Returning left children
-    private int leftChild(int pos) { return (2 * pos) + 1; }
-
-    // Returning right children
-    private int rightChild(int pos)
-    {
-        return (2 * pos) + 2;
-    }
-
-    // Returning true if given node is leaf
-    private boolean isLeaf(int pos)
-    {
-        if (pos > (size / 2) && pos <= size) {
-            return true;
-        }
-        return false;
-    }
-
-    // Swapping nodes
+    /**
+     * Swapping nodes.
+     * @param fpos first node position.
+     * @param spos second node position.
+     */
     private void swap(int fpos, int spos)
     {
         double tmp;
@@ -54,32 +42,13 @@ public class MaxHeap {
         Heap[spos] = tmp;
     }
 
-    /*// Recursive function to max heapify given subtree
-    private void maxHeapify(int pos)
-    {
-        if (isLeaf(pos))
-            return;
-
-        if (Heap[pos] < Heap[leftChild(pos)]
-                || Heap[pos] < Heap[rightChild(pos)]) {
-
-            if (Heap[leftChild(pos)]
-                    > Heap[rightChild(pos)]) {
-                swap(pos, leftChild(pos));
-                maxHeapify(leftChild(pos));
-            }
-            else {
-                swap(pos, rightChild(pos));
-                maxHeapify(rightChild(pos));
-            }
-        }
-    }*/
-
-    // Inserts a new element to max heap
+    /**
+     * Inserts a new element to max heap
+     * @param element the element I want to insert.
+     */
     public void insert(double element)
     {
         Heap[size] = element;
-
         // Traverse up and fix violated property
         int current = size;
         while (Heap[current] > Heap[parent(current)]) {
@@ -89,13 +58,17 @@ public class MaxHeap {
         size++;
     }
 
-    // Remove an element from max heap
-    public ArrayList<NeighboursInfo> extractMax(NeighboursInfo neighbour)
+    /**
+     * Find the max element. If the max element (popped) is bigger than the neighbour element,
+     * then the max element is removed and add the neighbour to nearestNeighbours.
+     * @param neighbour the point I want to insert to nearestNeighbours.
+     * @return the renewed ArrayList nearestNeighbours.
+     */
+    public ArrayList<NeighboursInfo> findMax(NeighboursInfo neighbour)
     {
         double popped = Heap[0];
         if (popped>neighbour.getDistance()) {
             Heap[0] = Heap[--size];
-            //maxHeapify(0);
             for (int i = 0; i < nearestNeighbours.size(); i++) {
                 if (nearestNeighbours.get(i).getDistance()==popped) {
                     nearestNeighbours.remove(nearestNeighbours.get(i));

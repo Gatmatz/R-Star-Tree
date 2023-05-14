@@ -10,7 +10,7 @@ public class DataBlock implements Serializable
     public ArrayList<Record> records;
 
     /**
-     *A constructor for a data block  that takes as parameters the id of the block.
+     *A constructor for a data block that takes as parameters the id of the block.
      * @param blockId block id.
      */
     public DataBlock(long blockId)
