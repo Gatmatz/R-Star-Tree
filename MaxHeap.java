@@ -1,17 +1,27 @@
+import java.util.ArrayList;
+
 public class MaxHeap {
-    private long[] Heap;
+    private double[] Heap;
     private int size;
     private int maxsize;
+    public ArrayList<NeighboursInfo> nearestNeighbours;
+
 
     /**
      * Constructor to initialize an empty max heap with given maximum capacity.
      */
-    public MaxHeap(int maxsize)
+    public MaxHeap(ArrayList<NeighboursInfo> nearest, int maxsize)
     {
         // This keyword refers to current instance itself
         this.maxsize = maxsize;
         this.size = 0;
-        Heap = new long[this.maxsize];
+        Heap = new double[this.maxsize];
+        for (NeighboursInfo a: nearest){
+            insert(a.distance);
+        }
+        nearestNeighbours=new ArrayList<>();
+        nearestNeighbours.addAll(nearest);
+
     }
 
     // Returning position of parent
@@ -38,13 +48,13 @@ public class MaxHeap {
     // Swapping nodes
     private void swap(int fpos, int spos)
     {
-        long tmp;
+        double tmp;
         tmp = Heap[fpos];
         Heap[fpos] = Heap[spos];
         Heap[spos] = tmp;
     }
 
-    // Recursive function to max heapify given subtree
+    /*// Recursive function to max heapify given subtree
     private void maxHeapify(int pos)
     {
         if (isLeaf(pos))
@@ -63,24 +73,37 @@ public class MaxHeap {
                 maxHeapify(rightChild(pos));
             }
         }
+    }*/
+
+    // Inserts a new element to max heap
+    public void insert(double element)
+    {
+        Heap[size] = element;
+
+        // Traverse up and fix violated property
+        int current = size;
+        while (Heap[current] > Heap[parent(current)]) {
+            swap(current, parent(current));
+            current = parent(current);
+        }
+        size++;
     }
 
     // Remove an element from max heap
-    public long extractMax()
+    public ArrayList<NeighboursInfo> extractMax(NeighboursInfo neighbour)
     {
-        long popped = Heap[0];
-        Heap[0] = Heap[--size];
-        maxHeapify(0);
-        return popped;
+        double popped = Heap[0];
+        if (popped>neighbour.getDistance()) {
+            Heap[0] = Heap[--size];
+            //maxHeapify(0);
+            for (int i = 0; i < nearestNeighbours.size(); i++) {
+                if (nearestNeighbours.get(i).getDistance()==popped) {
+                    nearestNeighbours.remove(nearestNeighbours.get(i));
+                }
+            }
+            nearestNeighbours.add(neighbour);
+        }
+        return nearestNeighbours;
     }
 
-    // main driver method
-    public static void main(String[] arg)
-    {
-        MaxHeap maxHeap = new MaxHeap(15);
-
-        // Print and display the maximum value in heap
-        System.out.println("The max val is "
-                + maxHeap.extractMax());
-    }
 }
