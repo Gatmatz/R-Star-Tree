@@ -35,4 +35,12 @@ public class Record implements Serializable{
      */
     public long getId() {return id;}
 
+    /**
+     * Gets the ArrayList of coordinates.
+     * @return double ArrayList of coordinates.
+     */
+    public ArrayList<Double> getCoordinates(){
+        return coordinates;
+    }
+
 }
