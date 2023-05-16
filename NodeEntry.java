@@ -1,11 +1,14 @@
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
- * Java Class that represents a non-Leaf Node of R*-Tree.
+ * Java Class that represents a non-Leaf Node entry of R*-Tree.
  * Based on the R*-tree implementation a non-leaf node consists of the child Node that points to lower level Node and its MBR,
  * which is the MBR that contains all child entries MBRs.
  */
-public class NodeEntry
+public class NodeEntry implements Serializable
 {
     private long childPtr;
     private MBR minimumBoundingRectangle;
@@ -59,7 +62,7 @@ public class NodeEntry
      * @param dimension integer value of the current dimension.
      * @return the upper bound of all entries.
      */
-    private double findMinBound(ArrayList<NodeEntry> entries, int dimension)
+    private static double findMinBound(ArrayList<NodeEntry> entries, int dimension)
     {
         double min=Double.MAX_VALUE;
         for (NodeEntry entry : entries) {
@@ -75,7 +78,7 @@ public class NodeEntry
      * @param dimension integer value of the current dimension.
      * @return the upper bound of all entries.
      */
-    private double findMaxBound(ArrayList<NodeEntry> entries, int dimension)
+    private static double findMaxBound(ArrayList<NodeEntry> entries, int dimension)
     {
         double max=Double.MIN_VALUE;
         for (NodeEntry entry : entries) {
@@ -92,7 +95,7 @@ public class NodeEntry
      * @param entries an ArrayList containing all entries(child) of current node.
      * @return an ArrayList representing the Minimum Bounding Rectangle.
      */
-    public ArrayList<Bounds> findMinBounds(ArrayList<NodeEntry> entries)
+    public static ArrayList<Bounds> findMinBounds(ArrayList<NodeEntry> entries)
     {
         ArrayList<Bounds> minBounds = new ArrayList<>();
         for (int i=0;i<DataFile.getNofCoordinates();i++)
@@ -114,7 +117,7 @@ public class NodeEntry
      * @param B a Minimum Bounding Rectangle
      * @return the bounds of a new MBR that fits MBR A and B.
      */
-    public ArrayList<Bounds> mergeMBR(MBR A, MBR B) {
+    public static ArrayList<Bounds> mergeMBR(MBR A, MBR B) {
         ArrayList<Bounds> minBounds = new ArrayList<>();
         for (int i = 0; i < DataFile.getNofCoordinates(); i++)
         {
@@ -161,6 +164,92 @@ public class NodeEntry
     public void fitAnotherEntry(NodeEntry n)
     {
         minimumBoundingRectangle = new MBR(mergeMBR(minimumBoundingRectangle,n.getMBR()));
+    }
+
+    /**
+     * Auxiliary function that parses through the node entries of a node and finds the node with the smallest plus area for the addition on new Data
+     * @param entries an ArrayList with the current entries in the node
+     * @param newData a new node entry to be inserted
+     * @return the node entry with the smallest plus area
+     */
+    public static NodeEntry findMinArea(ArrayList<NodeEntry> entries,NodeEntry newData)
+    {
+        double min = Double.MAX_VALUE;
+        NodeEntry minEntry = null;
+        for (NodeEntry entry : entries)
+        {
+            //Calculate the merged MBR with the addition of new Data and compute the plus area that will be needed.
+            MBR newMBR = new MBR(NodeEntry.mergeMBR(entry.getMBR(), newData.getMBR()));
+            double areaPlus = newMBR.area - entry.getMBR().area;
+            if (areaPlus<min) {
+                minEntry = entry;
+                min = areaPlus;
+            }
+            else if (areaPlus == min)
+            {
+                //Resolve ties by choosing the leaf with the rectangle of the smallest area
+                if (entry.getMBR().area < minEntry.getMBR().area)
+                    minEntry = entry;
+            }
+        }
+        return minEntry;
+    }
+
+    public static HashMap<Double,NodeEntry> getAreaEnlargement(ArrayList<NodeEntry> entries, NodeEntry newData)
+    {
+        HashMap<Double,NodeEntry> areaEnlargements = new HashMap<>();
+        for (NodeEntry entry : entries)
+        {
+            MBR newMBR = new MBR(NodeEntry.mergeMBR(entry.getMBR(), newData.getMBR()));
+            double areaPlus = newMBR.area - entry.getMBR().area;
+            areaEnlargements.put(areaPlus,entry);
+        }
+        return areaEnlargements;
+    }
+
+    /**
+     * Auxiliary function that parses through the node entries of a node and finds the node with the smallest plus overlap for the addition on new Data.
+     * @param entries an ArrayList with the current entries in the node
+     * @param newData a new node entry to be inserted
+     * @return the node entry with the smallest plus overlap
+     */
+    public static NodeEntry findMinOverlap(ArrayList<NodeEntry> entries,NodeEntry newData)
+    {
+        double min = Double.MAX_VALUE;
+        NodeEntry minEntry = null;
+        for (NodeEntry entry : entries)
+        {
+            //Calculate the merged MBR with the addition of new Data and compute the plus area that will be needed.
+            double overlap = getOverlap(entry.getMBR(),newData.getMBR());
+            if (overlap<min) {
+                minEntry = entry;
+                min = overlap;
+            }
+            else if (overlap == min)
+            {
+                //Resolve ties by choosing the entry whose rectangle needs the least area enlargement.
+                ArrayList<NodeEntry> resolveTies = new ArrayList<>();
+                resolveTies.add(entry);
+                resolveTies.add(minEntry);
+                minEntry = findMinArea(resolveTies,newData);
+            }
+        }
+        return minEntry;
+    }
+    /**
+     * Calculates the overlap between two MBRs along all axes.
+     * @param currentMBR one MBR
+     * @param newMBR another MBR
+     * @return the total overlap along all axes between two MBRs.
+     */
+    public static Double getOverlap(MBR currentMBR, MBR newMBR)
+    {
+        Double overlap = 1.0;
+        for(int i=0;i<DataFile.getNofCoordinates();i++)
+        {
+            overlap = overlap * Bounds.calculateOverlapAxis(currentMBR.getBounds().get(i),newMBR.getBounds().get(i));
+        }
+        return overlap;
     }
 
 }

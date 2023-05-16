@@ -162,6 +162,15 @@ public class DataFile {
         offset = calculateObjectSize(block0)-actualBlockSize; //Keep the difference between block0 size and other blocks
         writeObjectToFile(block0); //Write block0 to datafile
     }
+
+    /**
+     * Getter function that return the number of blocks in DataFile
+     * @return the number of blocks in Datafile.
+     */
+    public static int getNofBlocks()
+    {
+        return (int)Math.ceil((float)(RECORD_SIZE*records.size())/BLOCK_SIZE);
+    }
     /**
      * Basic function that parses through the records Arraylist and create blocks that writes on datafile.
      */
