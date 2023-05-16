@@ -7,6 +7,8 @@ public class Leaf extends NodeEntry
 {
     private int dataBlockID; //Block index that points to a specific block in dataFile.
     private int recordID; //Record index that points into a Record in a specific block.
+
+
     Leaf(int dataBlockID,int recordID, MBR mbr) {
         super(mbr);
         this.dataBlockID = dataBlockID;

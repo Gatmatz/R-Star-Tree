@@ -9,7 +9,7 @@ public class LinearNearestNeighbours implements Serializable {
     /**
      * Τhe constructor of a point whose k nearest neighbors I want to find.
      * @param k int k nearest neighbours.
-     * @param coordinates search point's coordinates
+     * @param coordinates search point's coordinates.
      */
     LinearNearestNeighbours(int k, ArrayList<Double> coordinates){
         this.k=k;
@@ -75,5 +75,4 @@ public class LinearNearestNeighbours implements Serializable {
         //System.out.println("id="+a.id+" distance="+dist);
         return Math.sqrt(dist);
     }
-
 }
