@@ -37,7 +37,6 @@ public class NodeEntry implements Serializable
         this.childPtr = childPtr;
     }
 
-
     /**
      * Getter that returns the Minimum Bounding Rectangle of current Node.
      * @return the Minimum Bounding Rectangle of current NodeEntry.
@@ -195,6 +194,12 @@ public class NodeEntry implements Serializable
         return minEntry;
     }
 
+    /**
+     * Computes the areaEnlargement of each entry in a ArrayList of NodeEntries after the addition of a new NodeEntry newData.
+     * @param entries the ArrayList of current NodeEntries
+     * @param newData the new NodeEntry to be inserted.
+     * @return a HashMap with the area enlargement
+     */
     public static HashMap<Double,NodeEntry> getAreaEnlargement(ArrayList<NodeEntry> entries, NodeEntry newData)
     {
         HashMap<Double,NodeEntry> areaEnlargements = new HashMap<>();

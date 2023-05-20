@@ -6,12 +6,12 @@ import java.util.Random;
 
 /**
  * Java Class that represents the services of an indexfile.
+ * Every block of the IndexFile is a Node.
  */
 public class IndexFile
 {
     public static String indexFilePath;
-    public static int nofLevels;
-    public static int nofBlocks;
+    public static int nofBlocks; //Total blocks of indexFile
     static RandomAccessFile indexFile;
 
     public IndexFile(String indexFilePath) throws IOException {
@@ -23,7 +23,6 @@ public class IndexFile
         indexFile = new RandomAccessFile(indexFilePath,"rw");
         indexFile.setLength(0);
         IndexFile.nofBlocks = 0;
-        IndexFile.nofLevels = 1;
     }
 
     /**
@@ -50,8 +49,13 @@ public class IndexFile
         return object.readObject();
     }
 
-
-    public static Node readIndexBlock(int blockID) throws IOException, ClassNotFoundException {
+    /**
+     * Function that reads a Node/indexfile Block from the indexFile.
+     * Reads the Node with the given blockID.
+     * @param blockID the index of the Node we want to read.
+     * @return the Node with the given blockID
+     */
+    public static Node readIndexBlock(long blockID) throws IOException, ClassNotFoundException {
         RandomAccessFile raf = new RandomAccessFile(new File(indexFilePath), "rw");
         FileInputStream fis = new FileInputStream(raf.getFD());
         BufferedInputStream bis = new BufferedInputStream(fis);
@@ -63,6 +67,11 @@ public class IndexFile
         return (Node) deserializeObject(block);
     }
 
+    /**
+     * Function that writes a new indexfile-block in indexFile.
+     * Writes a Node in memory.
+     * @param n the given new Node to be writter
+     */
     public static void createIndexFileBlock(Node n)
     {
         try {
@@ -73,11 +82,17 @@ public class IndexFile
             FileOutputStream fos = new FileOutputStream(indexFilePath,true);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             bos.write(block);
+            nofBlocks++;
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Function that overwrites an indexFile block which has the given blockID and replaces it with the newNode
+     * @param blockID the blockID of the block we want to overwrite
+     * @param newNode the new block we want to write to memory.
+     */
     public static void updateIndexBlock(int blockID, Node newNode)
     {
         try {
