@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -7,15 +6,11 @@ import java.util.ArrayList;
  */
 public class Node implements Serializable
 {
-    public static int maxEntries = IndexFile.calculateMaxEntries(); //Max number of nodeEntries a Node can fit based on BLOCK_SIZE
+    public static int maxEntries = IndexFile.calculateMaxEntries() -1 ; //Max number of nodeEntries a Node can fit based on BLOCK_SIZE
     public static int minEntries = (int)(0.4 * maxEntries); //Min number of nodeEntries a Node can have based on a percentage of maxEntries(40% of maxEntries)
     private int level; //The tree level of current node in the RStarTree
     private int blockID; //the block index in the indexFile that this node refers to
     private ArrayList<NodeEntry> entries; //the nodeEntries of current Node
-    public Node()
-    {
-
-    }
     public Node(int level, ArrayList<NodeEntry> entries)
     {
         this.level = level;
@@ -58,7 +53,7 @@ public class Node implements Serializable
 
     /**
      * Setter function that sets the blockID of current Node.
-     * @param blockID
+     * @param blockID index of block in the IndexFile
      */
     public void setBlockID(int blockID)
     {
@@ -67,7 +62,7 @@ public class Node implements Serializable
 
     /**
      * Setter function that sets the level in the tree of current Node.
-     * @param level
+     * @param level the current level of the Node
      */
     public void setLevel(int level)
     {

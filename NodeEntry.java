@@ -1,7 +1,6 @@
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TreeMap;
 
 /**
  * Java Class that represents a non-Leaf Node entry of R*-Tree.
@@ -21,11 +20,6 @@ public class NodeEntry implements Serializable
     NodeEntry(MBR mbr)
     {
         this.minimumBoundingRectangle = mbr;
-    }
-
-    NodeEntry()
-    {
-
     }
 
     /**
@@ -249,7 +243,7 @@ public class NodeEntry implements Serializable
      */
     public static Double getOverlap(MBR currentMBR, MBR newMBR)
     {
-        Double overlap = 1.0;
+        double overlap = 1.0;
         for(int i=0;i<DataFile.getNofCoordinates();i++)
         {
             overlap = overlap * Bounds.calculateOverlapAxis(currentMBR.getBounds().get(i),newMBR.getBounds().get(i));
@@ -257,4 +251,19 @@ public class NodeEntry implements Serializable
         return overlap;
     }
 
+    /**
+     * Function that computes the Euclidean distance between the centers of 2 MBRs.
+     * @param A one MBR
+     * @param B second MBR
+     * @return the distance between the MBRs
+     */
+    public static Double getDistanceBetweenCenters(MBR A, MBR B)
+    {
+        double distance = 0;
+        for (int i=0;i<DataFile.getNofCoordinates();i++)
+        {
+         distance += Math.pow(A.center.get(i)-B.center.get(i),2);
+        }
+        return Math.sqrt(distance);
+    }
 }

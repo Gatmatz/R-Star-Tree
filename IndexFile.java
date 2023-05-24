@@ -1,7 +1,5 @@
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -22,7 +20,7 @@ public class IndexFile
     public void createIndexFile() throws IOException {
         indexFile = new RandomAccessFile(indexFilePath,"rw");
         indexFile.setLength(0);
-        IndexFile.nofBlocks = 0;
+        IndexFile.nofBlocks = 1;
     }
 
     /**

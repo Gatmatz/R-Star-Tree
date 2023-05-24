@@ -1,6 +1,3 @@
-import com.sun.source.tree.Tree;
-
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.*;
 
@@ -13,8 +10,11 @@ public class RStarTree
     private static boolean[] reInsertedLevels; //Auxiliary boolean array to indicate which levels have been called by reInsert function.
     public static int LEAF_LEVEL = 1; //Leaf level is always 1
     public static final int P = 32; //Pre
+    private static final int REINSERT_ENTRIES = (int) (0.30 * Node.maxEntries); // Setting p to 30% of max entries
+
     RStarTree() throws IOException, ClassNotFoundException {
         TOTAL_LEVELS = 1;
+        reInsertedLevels = new boolean[100];
         insertLinear();
     }
 
@@ -55,7 +55,7 @@ public class RStarTree
      * @param data the new NodeEntry to be inserted
      * @return the best NodeEntry to insert the new NodeEntry.
      */
-    public NodeEntry chooseSubtreeInALevel(Node N, NodeEntry data) throws IOException, ClassNotFoundException {
+    public NodeEntry chooseSubtreeInALevel(Node N, NodeEntry data) {
         NodeEntry bestPick;
         //If the child pointers in N point to leaves.
         if (N.getLevel() - 1 == LEAF_LEVEL)
@@ -101,8 +101,8 @@ public class RStarTree
     /**
      * Split implementation of RStar-Tree paper.
      * A function to find good splits.
-     * @param n
-     * @return
+     * @param n the node to be split.
+     * @return an ArrayList with the parts of the split node.
      */
     public static ArrayList<Node> split(Node n)
     {
@@ -131,33 +131,52 @@ public class RStarTree
     {
         if (choice.compareTo("lower") == 0)
         {
-            HashMap<Double,NodeEntry> hashEntries = new HashMap<>();
+            HashMap<NodeEntry,Double> hashEntries = new HashMap<>();
             for (NodeEntry entry : entries)
             {
-                hashEntries.put(entry.getMBR().getBounds().get(dimension).getLower(),entry);
+                hashEntries.put(entry,entry.getMBR().getBounds().get(dimension).getLower());
             }
-            TreeMap<Double, NodeEntry> sorted = new TreeMap<>(hashEntries);
-            ArrayList<NodeEntry> result = new ArrayList<>();
-            for (Map.Entry<Double,NodeEntry> entry : sorted.entrySet())
+            ArrayList<Double> sortedValues = new ArrayList<>();
+            for (Map.Entry<NodeEntry,Double> entry: hashEntries.entrySet())
+                sortedValues.add(entry.getValue());
+            sortedValues.sort(Double::compareTo);
+            HashMap<NodeEntry,Double> sortedMap = new HashMap<>();
+            for (Double value: sortedValues)
             {
-                result.add(entry.getValue());
+                for (Map.Entry<NodeEntry,Double> entry : hashEntries.entrySet())
+                {
+                    if (entry.getValue().equals(value))
+                        sortedMap.put(entry.getKey(),value);
+                }
             }
+            ArrayList<NodeEntry> result = new ArrayList<>();
+            for(Map.Entry<NodeEntry, Double> entry :sortedMap.entrySet())
+                result.add(entry.getKey());
             return result;
-
         }
         else if (choice.compareTo("upper") == 0)
         {
-            HashMap<Double,NodeEntry> hashEntries = new HashMap<>();
+            HashMap<NodeEntry,Double> hashEntries = new HashMap<>();
             for (NodeEntry entry : entries)
             {
-                hashEntries.put(entry.getMBR().getBounds().get(dimension).getUpper(),entry);
+                hashEntries.put(entry,entry.getMBR().getBounds().get(dimension).getUpper());
             }
-            TreeMap<Double, NodeEntry> sorted = new TreeMap<>(hashEntries);
-            ArrayList<NodeEntry> result = new ArrayList<>();
-            for (Map.Entry<Double,NodeEntry> entry : sorted.entrySet())
+            ArrayList<Double> sortedValues = new ArrayList<>();
+            for (Map.Entry<NodeEntry,Double> entry: hashEntries.entrySet())
+                sortedValues.add(entry.getValue());
+            sortedValues.sort(Comparator.naturalOrder());
+            HashMap<NodeEntry,Double> sortedMap = new HashMap<>();
+            for (Double value: sortedValues)
             {
-                result.add(entry.getValue());
+                for (Map.Entry<NodeEntry,Double> entry : hashEntries.entrySet())
+                {
+                    if (entry.getValue().equals(value))
+                        sortedMap.put(entry.getKey(),value);
+                }
             }
+            ArrayList<NodeEntry> result = new ArrayList<>();
+            for(Map.Entry<NodeEntry, Double> entry :sortedMap.entrySet())
+                result.add(entry.getKey());
             return result;
         }
         return null;
@@ -198,7 +217,7 @@ public class RStarTree
                 MBR secondGroupMBR = new MBR(NodeEntry.findMinBounds(secondGroup));
                 Distribution currentDistribution = new Distribution(k,new NodeGroup(firstGroup,firstGroupMBR),new NodeGroup(secondGroup,secondGroupMBR));
                 distributions.add(currentDistribution);
-                    S = S + (firstGroupMBR.perimeter + secondGroupMBR.perimeter);
+                S = S + (firstGroupMBR.perimeter + secondGroupMBR.perimeter);
             }
 
             //CSA2: Choose the axis with the minimum S as split axis
@@ -245,7 +264,7 @@ public class RStarTree
     public static int chooseSplitIndex(ArrayList<Distribution> distributions)
     {
         //CSI1: Along the chosen split axis, choose the distribution with the minimum overlap-value
-        Double minOverlap = Double.MAX_VALUE;
+        double minOverlap = Double.MAX_VALUE;
         double minArea = Double.MAX_VALUE;
         int bestDistributionIndex = 0;
         for (Distribution distribution : distributions)
@@ -284,7 +303,7 @@ public class RStarTree
         }
         Leaf dummy = new Leaf(dataBlockID,r.getId(),new MBR(totalBounds));
         //ID1: Invoke Insert starting with the leaf level as a parameter, to insert a new data rectangle
-        recursiveInsert(null,null,dummy);
+        recursiveInsert(null,null,dummy,LEAF_LEVEL);
     }
 
     /**
@@ -298,9 +317,9 @@ public class RStarTree
     NodeEntry overFlowTreatment(Node parentOfN, NodeEntry parentEntryOfN, Node N) throws IOException, ClassNotFoundException {
         // If the level is not the root level and this is the first call of OverflowTreatment
         // in the given level during the insertion of one data rectangle, then reinsert
-        if (N.getBlockID() != RStarTree.getRootLevel() && !reInsertedLevels[N.getLevel()])
+        if (N.getBlockID() != RStarTree.getRootLevel() && !reInsertedLevels[N.getLevel()-1])
         {
-            reInsertedLevels[N.getLevel()] = true; // Mark level as already inserted
+            reInsertedLevels[N.getLevel()-1] = true; // Mark level as already inserted
             reInsert(parentOfN,parentEntryOfN,N);
             return null;
         }
@@ -317,8 +336,8 @@ public class RStarTree
                 otherNode.setBlockID(IndexFile.nofBlocks);
                 IndexFile.createIndexFileBlock(otherNode);
                 ArrayList<NodeEntry> newRootEntries = new ArrayList<>();
-                newRootEntries.add(new NodeEntry(split.get(0)));
-                newRootEntries.add(new NodeEntry(split.get(1)));
+                newRootEntries.add(new NodeEntry(N));
+                newRootEntries.add(new NodeEntry(otherNode));
                 Node newRoot = new Node(++TOTAL_LEVELS,newRootEntries);
                 newRoot.setBlockID(1);
                 IndexFile.updateIndexBlock(1,newRoot);
@@ -332,7 +351,7 @@ public class RStarTree
                 otherNode.setBlockID(IndexFile.nofBlocks);
                 IndexFile.createIndexFileBlock(otherNode);
                 parentEntryOfN.fitEntries(N.getEntries());
-                IndexFile.updateIndexBlock(parentOfN.getLevel(),parentOfN);
+                IndexFile.updateIndexBlock(parentOfN.getBlockID(),parentOfN);
                 return new NodeEntry(otherNode);
             }
         }
@@ -348,7 +367,7 @@ public class RStarTree
      * @param E the NodeEntry to be inserted
      * @return a NodeEntry to inform previous calls about a split, null otherwise.
      */
-    NodeEntry recursiveInsert(Node parent, NodeEntry parentEntry, NodeEntry E) throws IOException, ClassNotFoundException {
+    NodeEntry recursiveInsert(Node parent, NodeEntry parentEntry, NodeEntry E, int level) throws IOException, ClassNotFoundException {
         Node recursiveNode;
         long recursive;
         //Start from the root
@@ -362,12 +381,11 @@ public class RStarTree
             IndexFile.updateIndexBlock(parent.getBlockID(),parent);
             recursive = parentEntry.getChildPtr();
         }
-
         recursiveNode = IndexFile.readIndexBlock(recursive);
-        if (recursiveNode.getLevel() != LEAF_LEVEL)
+        if (recursiveNode.getLevel() != level)
         {
             NodeEntry bestFit = chooseSubtreeInALevel(recursiveNode,E);
-            NodeEntry newRecursion = recursiveInsert(recursiveNode,bestFit,E);
+            NodeEntry newRecursion = recursiveInsert(recursiveNode,bestFit,E,level);
             if (newRecursion != null)
             {
                 recursiveNode.insertEntry(newRecursion);
@@ -384,15 +402,9 @@ public class RStarTree
             recursiveNode.insertEntry(E);
             IndexFile.updateIndexBlock(recursiveNode.getBlockID(),recursiveNode);
         }
-        // If N has M+1 items. invoke OverflowTreatment with the
-        // level of N as a parameter [for reinsertion or split]
-        if (recursiveNode.getEntries().size() > Node.maxEntries)
-        {
-            // I3: If OverflowTreatment was called and a split was
-            // performed, propagate OverflowTreatment upwards
-            // if necessary
+        if (recursiveNode.getEntries().size() == Node.maxEntries)
             return overFlowTreatment(parent,parentEntry,recursiveNode);
-        }
+
         return null;
     }
 
@@ -404,11 +416,50 @@ public class RStarTree
      * @param N the current Node N
      */
     public void reInsert(Node parent, NodeEntry parentEntry, Node N) throws IOException, ClassNotFoundException {
-
+        //RI1: For all M+1 entries of a node N, compute the distance between the centers of their rectangles and the center of the bounding rectangle N
+        //RI2: Sort the entries in decreasing order of their distances computed in RI1
+        ArrayList<NodeEntry> sorted = sortbyCenterDistance(N.getEntries(),parentEntry);
+        //RI3: Remove the first p entries from N and adjust the bounding rectangle of N
         ArrayList<NodeEntry> removed = new ArrayList<>();
+        for (int i=sorted.size()-REINSERT_ENTRIES;i<sorted.size();i++)
+        {
+            removed.add(sorted.get(i));
+        }
+        for(int i = 0; i < REINSERT_ENTRIES; i++)
+            N.getEntries().remove(N.getEntries().size()-1);
+
+        // Updating bounding box of node and to the parent entry
+        parentEntry.fitEntries(N.getEntries());
+        IndexFile.updateIndexBlock(parent.getBlockID(),parent);
+        IndexFile.updateIndexBlock(N.getBlockID(),N);
+
+
         for (NodeEntry nodeEntry : removed)
         {
-            recursiveInsert(null,null,nodeEntry);
+            recursiveInsert(null,null,nodeEntry,N.getLevel());
         }
+    }
+
+    /**
+     * Auxiliary function that sortes the entries of a Node base on the distance between their MBRs and the MBR of the parent Node.
+     * The function sorts in increasing order and the distance is Euclidean.
+     * @param entries the entries of the Node.
+     * @param parent the parent Node
+     * @return an ArrayList with the entries sorted by the distance.
+     */
+    private static ArrayList<NodeEntry> sortbyCenterDistance(ArrayList<NodeEntry> entries, NodeEntry parent)
+    {
+        HashMap<Double,NodeEntry> hashEntries = new HashMap<>();
+        for (NodeEntry entry : entries)
+        {
+            hashEntries.put(NodeEntry.getDistanceBetweenCenters(entry.getMBR(),parent.getMBR()),entry);
+        }
+        TreeMap<Double, NodeEntry> sorted = new TreeMap<>(hashEntries);
+        ArrayList<NodeEntry> result = new ArrayList<>();
+        for (Map.Entry<Double,NodeEntry> entry : sorted.entrySet())
+        {
+            result.add(entry.getValue());
+        }
+        return result;
     }
 }
