@@ -12,10 +12,10 @@ public class RStarTree
     public static final int P = 32; //Pre
     private static final int REINSERT_ENTRIES = (int) (0.30 * Node.maxEntries); // Setting p to 30% of max entries
 
-    RStarTree() throws IOException, ClassNotFoundException {
+    RStarTree()
+    {
         TOTAL_LEVELS = 1;
         reInsertedLevels = new boolean[100];
-        insertLinear();
     }
 
     public static int getRootLevel() throws IOException, ClassNotFoundException {
@@ -38,6 +38,17 @@ public class RStarTree
             {
                 insertData(record,i);
             }
+        }
+    }
+
+    /**
+     * Function that creates the RStar-tree by bulk-loading the records from the datafile.
+     */
+    void bulkLoad()
+    {
+        for (int i=1;i<=DataFile.getNofBlocks();i++)
+        {
+            DataBlock blockn = DataFile.readDataFileBlock(i);
         }
     }
     /**

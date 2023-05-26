@@ -4,26 +4,25 @@ import java.util.ArrayList;
 /**
  * Java Class that represents a record.
  */
-public class Record implements Serializable{
+public class Record implements Serializable {
     public long id;
     public ArrayList<Double> coordinates;
 
     /**
-     *A constructor for a record that takes as parameters the id of the record and its coordinates.
-     * @param id record id.
+     * A constructor for a record that takes as parameters the id of the record and its coordinates.
+     *
+     * @param id  record id.
      * @param cor the coordinates.
      */
-    public Record(long id, ArrayList<Double> cor)
-    {
-        this.id=id;
-        coordinates=new ArrayList<>();
+    public Record(long id, ArrayList<Double> cor) {
+        this.id = id;
+        coordinates = new ArrayList<>();
         coordinates.addAll(cor);
     }
 
-    public void printIt()
-    {
+    public void printIt() {
         System.out.println(id);
-        for (Double c: coordinates){
+        for (Double c : coordinates) {
             System.out.println(c);
         }
         System.out.println("");
@@ -31,16 +30,28 @@ public class Record implements Serializable{
 
     /**
      * Gets the id of a specific record.
+     *
      * @return long record ID.
      */
-    public long getId() {return id;}
+    public long getId() {
+        return id;
+    }
 
     /**
      * Gets the ArrayList of coordinates.
+     *
      * @return double ArrayList of coordinates.
      */
-    public ArrayList<Double> getCoordinates(){
+    public ArrayList<Double> getCoordinates() {
         return coordinates;
     }
 
+    /**
+     * Function that calculates the Hilbert value of a Record.
+     * @return the Hilbert value of a Record.
+     */
+    public long getHilbertValue()
+    {
+        return HilbertCurve.convertToDValue(this);
+    }
 }
