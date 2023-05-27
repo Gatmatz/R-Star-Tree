@@ -6,7 +6,7 @@ import java.util.*;
  */
 public class RStarTree
 {
-    private static int TOTAL_LEVELS; //Total levels of RStar-tree
+    public static int TOTAL_LEVELS; //Total levels of RStar-tree
     private static boolean[] reInsertedLevels; //Auxiliary boolean array to indicate which levels have been called by reInsert function.
     public static int LEAF_LEVEL = 1; //Leaf level is always 1
     public static final int P = 32; //Pre
@@ -49,6 +49,7 @@ public class RStarTree
         for (int i=1;i<=DataFile.getNofBlocks();i++)
         {
             DataBlock blockn = DataFile.readDataFileBlock(i);
+
         }
     }
     /**
