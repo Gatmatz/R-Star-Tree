@@ -12,6 +12,10 @@ public class RStarTree
     public static final int P = 32; //Pre
     private static final int REINSERT_ENTRIES = (int) (0.30 * Node.maxEntries); // Setting p to 30% of max entries
 
+    /**
+     * RStarTree constructor that initializes the total levels of the tree to 1,
+     * and the reInsertedLevels array to 100 size(R*-trees do not have more that 5-10 levels, so 100 is fine).
+     */
     RStarTree()
     {
         TOTAL_LEVELS = 1;
@@ -44,12 +48,53 @@ public class RStarTree
     /**
      * Function that creates the RStar-tree by bulk-loading the records from the datafile.
      */
-    void bulkLoad()
-    {
-        for (int i=1;i<=DataFile.getNofBlocks();i++)
+    void bulkLoad() throws IOException, ClassNotFoundException {
+        //Sort the DataBlocks from the DataFile and save them to externalSort.txt
+        HilbertCurveSort.internalSort();
+        //Initialize counters for the filling of the Leafs
+        int blockCounter = 1; //keeps track of the blocks in the Datafile
+        int recordCounter = 0; //keeps track of the records in a specific DataBlock
+        int nodeCounter = 1; //keeps track of the blocks in the IndexFile
+        int nodeIndex = 0; //keeps track of the records in a specific Node in the indexFile
+        DataBlock blockn = HilbertCurveSort.readBufferBlock(blockCounter,"files/externalSort.txt");
+        ArrayList<NodeEntry> entries = new ArrayList<>();
+        while (blockCounter <=DataFile.getNofBlocks())
         {
-            DataBlock blockn = DataFile.readDataFileBlock(i);
-
+            //If the current Node is full
+            if (nodeIndex == Node.maxEntries)
+            {
+                //Write current node to the IndexFile
+                Node node = new Node(LEAF_LEVEL,entries);
+                node.setBlockID(nodeCounter+1);
+                IndexFile.createIndexFileBlock(node);
+                //Initialize a new Node
+                nodeIndex = 0;
+                nodeCounter++;
+                entries = new ArrayList<>();
+            }
+            //If current DataBlock is finished its fetching
+            if (recordCounter == blockn.records.size())
+            {
+                //Read the next dataBlock
+                blockCounter++;
+                if (blockCounter > DataFile.getNofBlocks())
+                    break;
+                blockn = HilbertCurveSort.readBufferBlock(blockCounter,"files/externalSort.txt");
+                recordCounter=0;
+            }
+            //Create an appropriate Leaf for each record
+            Record record = blockn.records.get(recordCounter);
+            ArrayList<Bounds> totalBounds = new ArrayList<>();
+            for (int d=0;d<DataFile.nofCoordinates;d++)
+            {
+                Bounds boundsOneD = new Bounds(record.coordinates.get(d),record.coordinates.get(d));
+                totalBounds.add(boundsOneD);
+            }
+            Leaf entry = new Leaf(blockCounter, record.getId(),new MBR(totalBounds));
+            //Add the Leaf entry to current Node
+            entries.add(entry);
+            nodeIndex++;
+            recordCounter++;
         }
     }
     /**

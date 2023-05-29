@@ -1,8 +1,5 @@
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
 import java.util.Scanner;
 
 public class DataFile {
@@ -19,7 +16,7 @@ public class DataFile {
     DataFile(String csvPath, String dataFilePath) throws IOException
     {
         this.csvPath = csvPath;
-        this.dataFilePath = dataFilePath;
+        DataFile.dataFilePath = dataFilePath;
     }
 
     public void createDatafile() throws IOException {
@@ -180,6 +177,9 @@ public class DataFile {
         DataBlock nblock = new DataBlock(blockCounter);
         for (Record record : records)
         {
+            //If block can fit more records,add one more record to block
+            nblock.addRecord(record);
+
             //If blocksize is passed
             if (RECORD_SIZE + RECORD_SIZE*nblock.getNofRecords() > BLOCK_SIZE)
             {
@@ -187,11 +187,6 @@ public class DataFile {
                 //Create next block
                 blockCounter++;
                 nblock = new DataBlock(blockCounter);
-            }
-            else //If block can fit more records
-            {
-                //Add one more record to block
-                nblock.addRecord(record);
             }
         }
         writeObjectToFile(nblock); //Write the last block to datafile

@@ -16,7 +16,6 @@ public class Node implements Serializable
         this.level = level;
         this.entries = new ArrayList<>(entries);
     }
-
     /**
      * Getter that returns the level of current node in the R*-tree
      */

@@ -1,7 +1,10 @@
 import java.io.*;
 import java.util.*;
 
-public class ExternalMergeSort {
+/**
+ * Java Class that contains all the tools to sort a DataFile using the HilbertCurve.
+ */
+public class HilbertCurveSort {
     public static long noOfBlocks=DataFile.getNofBlocks();
     public static String outputFile = "files/externalSort.txt";
     public static String tempFile = "files/externalSort.tmp";
@@ -30,7 +33,7 @@ public class ExternalMergeSort {
     }
 
     /**
-     * Function that reads a Node/indexfile Block from the indexFile.
+     * Function that reads a Node/indexFile Block from the indexFile.
      * Reads the Node with the given blockID.
      * @param blockID the index of the Node we want to read.
      * @return the Node with the given blockID
@@ -48,9 +51,9 @@ public class ExternalMergeSort {
     }
 
     /**
-     * Function that writes a new indexfile-block in indexFile.
+     * Function that writes a new indexFile-block in indexFile.
      * Writes a Node in memory.
-     * @param n the given new Node to be writter
+     * @param n the given new Node to be written
      */
     public static void createBufferBlock(DataBlock n, String file)
     {
@@ -89,12 +92,17 @@ public class ExternalMergeSort {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Function that executes a sorting of all the records of all DataBlocks in-memory.
+     * The records are sorted based on their position in the Hilbert Curve.
+     */
     public static void internalSort() throws IOException {
         RandomAccessFile bufferFile = new RandomAccessFile(outputFile,"rw");
         bufferFile.setLength(0);
         //Fetch all records into memory
         ArrayList<Record> records = new ArrayList<>();
-        int nofRecords = DataFile.readDataFileBlock(2).records.size();
+        int nofRecords = DataFile.readDataFileBlock(1).records.size();
         for (int i=1;i<=DataFile.getNofBlocks();i++)
         {
             DataBlock blockn = DataFile.readDataFileBlock(i);
@@ -118,8 +126,14 @@ public class ExternalMergeSort {
             i++;
         }
         createBufferBlock(blockn,outputFile);
-        return;
     }
+
+    /**
+     * Auxiliary Function that sorts the records of a given DataBlock(its entries).
+     * The function sorts the records based on their position on the Hilbert Curve.
+     * @param buffer the given records of a DataBlock.
+     * @return the records sorted.
+     */
     private static ArrayList<Record> sortRecords(ArrayList<Record> buffer)
     {
         HashMap<Record,Long> hashEntries = new HashMap<>();
@@ -145,7 +159,7 @@ public class ExternalMergeSort {
             result.add(entry.getKey());
         return result;
     }
-    private static void sortAndWriteBuffer(ArrayList<Record> buffer, int counter) throws IOException {
+    private static void sortAndWriteBuffer(ArrayList<Record> buffer, int counter) {
         ArrayList<Record> sortedBuffer = sortRecords(buffer);
         DataBlock blockn = new DataBlock(counter);
         blockn.records = new ArrayList<>(sortedBuffer);
@@ -241,6 +255,11 @@ public class ExternalMergeSort {
         }
         createBufferBlock(outputBlock,outputFile);
     }
+
+    /**
+     * Auxiliary function that retrieves all sorted DataBlocks and saves them into an ArrayList.
+     * @return the ArrayList of the sorted DataBlocks.
+     */
     public static ArrayList<DataBlock> getBlocks() throws IOException, ClassNotFoundException {
         long nofBlocks = DataFile.getNofBlocks();
         ArrayList<DataBlock> blocks = new ArrayList<>();
