@@ -46,9 +46,9 @@ public class RStarTree
     }
 
     /**
-     * Function that creates the RStar-tree by bulk-loading the records from the datafile.
+     * Auxiliary function that bulk-loads the records from the datafile to leafs.
      */
-    void bulkLoad() throws IOException, ClassNotFoundException {
+    private static void bulkLoadLeafs() throws IOException, ClassNotFoundException {
         //Sort the DataBlocks from the DataFile and save them to externalSort.txt
         HilbertCurveSort.internalSort();
         //Initialize counters for the filling of the Leafs
@@ -96,7 +96,69 @@ public class RStarTree
             nodeIndex++;
             recordCounter++;
         }
+        //Write final node to the IndexFile
+        Node node = new Node(LEAF_LEVEL,entries);
+        node.setBlockID(nodeCounter+1);
+        IndexFile.createIndexFileBlock(node);
     }
+    private static ArrayList<Node> buildBulkLevel(int level) throws IOException, ClassNotFoundException {
+        //Get all nodes that need to be organised in the current level
+        ArrayList<Node> nodesInLevel = new ArrayList<>();
+        for (int i=1;i<IndexFile.nofBlocks;i++)
+        {
+            Node nodeN = IndexFile.readIndexBlock(i);
+            if (nodeN.getLevel() == level)
+            {
+                nodesInLevel.add(nodeN);
+            }
+        }
+        int nodeIndex = 0;
+        int nodeCounter = IndexFile.nofBlocks;
+        ArrayList<NodeEntry> entries = new ArrayList<>();
+        ArrayList<Node> upperNodes = new ArrayList<>();
+        while (nodeIndex < nodesInLevel.size())
+        {
+            if (entries.size() == Node.maxEntries)
+            {
+                Node upperNode = new Node(level+1,entries);
+                upperNode.setBlockID(nodeCounter);
+                nodeCounter++;
+                IndexFile.createIndexFileBlock(upperNode);
+                upperNodes.add(upperNode);
+            }
+
+            //Fetch node
+            Node n = nodesInLevel.get(nodeIndex);
+            //Create a nodeEntry for this node in the upper level
+            NodeEntry upper = new NodeEntry(n);
+            entries.add(upper);
+            nodeIndex++;
+        }
+        Node upperNode = new Node(level+1,entries);
+        upperNode.setBlockID(nodeCounter);
+        nodeCounter++;
+        IndexFile.createIndexFileBlock(upperNode);
+        upperNodes.add(upperNode);
+        return upperNodes;
+    }
+    /**
+     * Function that creates the RStar-tree by bulk-loading the records from the datafile.
+     */
+    public static void bulkLoad() throws IOException, ClassNotFoundException {
+        bulkLoadLeafs();
+//        int currentLevel = LEAF_LEVEL;
+//        ArrayList<Node> buildedLevels = buildBulkLevel(currentLevel);
+//        currentLevel++;
+//        while (buildedLevels.size() != 1)
+//        {
+//            buildedLevels = buildBulkLevel(currentLevel);
+//            currentLevel++;
+//        }
+//        Node root = buildedLevels.get(0);
+//        root.setBlockID(1);
+//        IndexFile.updateIndexBlock(1,root);
+    }
+
     /**
      * Getter function that return the root Node
      * @return root Node object

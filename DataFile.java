@@ -143,7 +143,7 @@ public class DataFile {
         Record nofRecords = new Record(records.size(),dummy);
         block0.addRecord(nofRecords);
 
-        int intofBlocks = (int)Math.ceil((float)(RECORD_SIZE*records.size())/BLOCK_SIZE); //Calculate number of Blocks needed
+        int intofBlocks = getNofBlocks(); //Calculate number of Blocks needed
         Record nofBlocks = new Record(intofBlocks,dummy);
         block0.addRecord(nofBlocks);
 
@@ -166,7 +166,12 @@ public class DataFile {
      */
     public static int getNofBlocks()
     {
-        return (int)Math.ceil((float)(RECORD_SIZE*records.size())/BLOCK_SIZE);
+        float d1 = (float)(RECORD_SIZE*records.size())/BLOCK_SIZE;
+        double d2 = Math.ceil((float)(RECORD_SIZE*records.size())/BLOCK_SIZE);
+        if (d2-d1<0.4)
+            return (int)d2+1;
+        else
+            return (int)d2;
     }
     /**
      * Basic function that parses through the records Arraylist and create blocks that writes on datafile.
@@ -221,8 +226,8 @@ public class DataFile {
     public static DataBlock readDataFileBlock(int blockId)
     {
         //Check if block exists
-        int numofBlocks = (int)Math.ceil((float)(RECORD_SIZE*records.size())/BLOCK_SIZE);
-        if (blockId>numofBlocks)
+        int numofBlocks = getNofBlocks();
+        if (blockId>numofBlocks+1)
             return null;
         try {
             //Read DataFile
@@ -256,10 +261,10 @@ public class DataFile {
      * Basic function that returns all Blocks of a Datafile as an ArrayList.
      * @return an ArrayList that contains all blocks of datafile
      */
-    public  ArrayList<DataBlock> getBlocks()
+    public static ArrayList<DataBlock> getBlocks()
     {
         //Calculate number of blocks to be fetched
-        int nofBlocks = (int)Math.ceil((float)(RECORD_SIZE*records.size())/BLOCK_SIZE);
+        int nofBlocks = getNofBlocks();
         ArrayList<DataBlock> blocks = new ArrayList<>();
         for (int i=1;i<=nofBlocks;i++)
         {
