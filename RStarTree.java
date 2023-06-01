@@ -65,11 +65,11 @@ public class RStarTree
             {
                 //Write current node to the IndexFile
                 Node node = new Node(LEAF_LEVEL,entries);
-                node.setBlockID(nodeCounter+1);
+                nodeCounter++;
+                node.setBlockID(nodeCounter);
                 IndexFile.createIndexFileBlock(node);
                 //Initialize a new Node
                 nodeIndex = 0;
-                nodeCounter++;
                 entries = new ArrayList<>();
             }
             //If current DataBlock is finished its fetching
@@ -98,9 +98,16 @@ public class RStarTree
         }
         //Write final node to the IndexFile
         Node node = new Node(LEAF_LEVEL,entries);
-        node.setBlockID(nodeCounter+1);
+        nodeCounter++;
+        node.setBlockID(nodeCounter);
         IndexFile.createIndexFileBlock(node);
     }
+
+    /**
+     * Auxiliary function that builds an upper level of given level of the tree.
+     * @param level the current level of building
+     * @return an ArrayList of the newly created nodes in the upper level
+     */
     private static ArrayList<Node> buildBulkLevel(int level) throws IOException, ClassNotFoundException {
         //Get all nodes that need to be organised in the current level
         ArrayList<Node> nodesInLevel = new ArrayList<>();
@@ -112,19 +119,23 @@ public class RStarTree
                 nodesInLevel.add(nodeN);
             }
         }
-        int nodeIndex = 0;
+        //Create new nodes upwards
+        int nodeIndex = 0; //keeps track of the index in current Node
         int nodeCounter = IndexFile.nofBlocks;
-        ArrayList<NodeEntry> entries = new ArrayList<>();
-        ArrayList<Node> upperNodes = new ArrayList<>();
+        ArrayList<NodeEntry> entries = new ArrayList<>(); //stores the entries that will stored in a Node
+        ArrayList<Node> upperNodes = new ArrayList<>(); //stores all the newly created nodes in the upper level
         while (nodeIndex < nodesInLevel.size())
         {
+            //If node in upper level is full
             if (entries.size() == Node.maxEntries)
             {
+                //Create the node and write it to IndexFile
                 Node upperNode = new Node(level+1,entries);
-                upperNode.setBlockID(nodeCounter);
                 nodeCounter++;
+                upperNode.setBlockID(nodeCounter);
                 IndexFile.createIndexFileBlock(upperNode);
                 upperNodes.add(upperNode);
+                entries = new ArrayList<>();
             }
 
             //Fetch node
@@ -134,9 +145,10 @@ public class RStarTree
             entries.add(upper);
             nodeIndex++;
         }
+        //Create the last Node needed
         Node upperNode = new Node(level+1,entries);
-        upperNode.setBlockID(nodeCounter);
         nodeCounter++;
+        upperNode.setBlockID(nodeCounter);
         IndexFile.createIndexFileBlock(upperNode);
         upperNodes.add(upperNode);
         return upperNodes;
@@ -145,18 +157,25 @@ public class RStarTree
      * Function that creates the RStar-tree by bulk-loading the records from the datafile.
      */
     public static void bulkLoad() throws IOException, ClassNotFoundException {
+        //Create a dummy Root to initialize IndexFile
+        Node dummyRoot = new Node(LEAF_LEVEL,new ArrayList<>());
+        dummyRoot.setBlockID(1);
+        IndexFile.createIndexFileBlock(dummyRoot);
+        //Start from the leafs
         bulkLoadLeafs();
-//        int currentLevel = LEAF_LEVEL;
-//        ArrayList<Node> buildedLevels = buildBulkLevel(currentLevel);
-//        currentLevel++;
-//        while (buildedLevels.size() != 1)
-//        {
-//            buildedLevels = buildBulkLevel(currentLevel);
-//            currentLevel++;
-//        }
-//        Node root = buildedLevels.get(0);
-//        root.setBlockID(1);
-//        IndexFile.updateIndexBlock(1,root);
+        //Recursively create nodes upwards
+        int currentLevel = LEAF_LEVEL;
+        ArrayList<Node> buildedLevels = buildBulkLevel(currentLevel);
+        currentLevel++;
+        while (buildedLevels.size() != 1)
+        {
+            buildedLevels = buildBulkLevel(currentLevel);
+            currentLevel++;
+        }
+        //Update the root node
+        Node root = buildedLevels.get(0);
+        root.setBlockID(1);
+        IndexFile.updateIndexBlock(1,root);
     }
 
     /**
