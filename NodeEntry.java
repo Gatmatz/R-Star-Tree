@@ -142,7 +142,7 @@ public class NodeEntry implements Serializable
     }
 
     /**
-     * Function that sets the MBR of current node to a MBR that fits all entries.
+     * Function that sets the MBR of current node to MBR that fits all entries.
      * @param entries an ArrayList that contains all NodeEntries of current Node.
      */
     public void fitEntries(ArrayList<NodeEntry> entries)
