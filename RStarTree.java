@@ -22,6 +22,10 @@ public class RStarTree
         reInsertedLevels = new boolean[100];
     }
 
+    /**
+     * Function that reads the first block in IndexFile, which is always the root and returns its level.
+     * @return the level of the root in the tree.
+     */
     public static int getRootLevel() throws IOException, ClassNotFoundException {
         Node root = IndexFile.readIndexBlock(1);
         return root.getLevel();
@@ -46,9 +50,9 @@ public class RStarTree
     }
 
     /**
-     * Auxiliary function that bulk-loads the records from the datafile to leafs.
+     * Auxiliary function that bulk-loads the records from the datafile to leaves.
      */
-    private static void bulkLoadLeafs() throws IOException, ClassNotFoundException {
+    private static void bulkLoadLeaves() throws IOException, ClassNotFoundException {
         //Sort the DataBlocks from the DataFile and save them to externalSort.txt
         HilbertCurveSort.internalSort();
         //Initialize counters for the filling of the Leafs
@@ -161,8 +165,8 @@ public class RStarTree
         Node dummyRoot = new Node(LEAF_LEVEL,new ArrayList<>());
         dummyRoot.setBlockID(1);
         IndexFile.createIndexFileBlock(dummyRoot);
-        //Start from the leafs
-        bulkLoadLeafs();
+        //Start from the leaves
+        bulkLoadLeaves();
         //Recursively create nodes upwards
         int currentLevel = LEAF_LEVEL;
         ArrayList<Node> buildedLevels = buildBulkLevel(currentLevel);
@@ -278,7 +282,7 @@ public class RStarTree
             for (Map.Entry<NodeEntry,Double> entry: hashEntries.entrySet())
                 sortedValues.add(entry.getValue());
             sortedValues.sort(Double::compareTo);
-            HashMap<NodeEntry,Double> sortedMap = new HashMap<>();
+            LinkedHashMap<NodeEntry,Double> sortedMap = new LinkedHashMap<>();
             for (Double value: sortedValues)
             {
                 for (Map.Entry<NodeEntry,Double> entry : hashEntries.entrySet())
@@ -303,7 +307,7 @@ public class RStarTree
             for (Map.Entry<NodeEntry,Double> entry: hashEntries.entrySet())
                 sortedValues.add(entry.getValue());
             sortedValues.sort(Comparator.naturalOrder());
-            HashMap<NodeEntry,Double> sortedMap = new HashMap<>();
+            LinkedHashMap<NodeEntry,Double> sortedMap = new LinkedHashMap<>();
             for (Double value: sortedValues)
             {
                 for (Map.Entry<NodeEntry,Double> entry : hashEntries.entrySet())
@@ -332,7 +336,7 @@ public class RStarTree
         //CSA1: For each axis
         for (int i=0;i<DataFile.getNofCoordinates();i++)
         {
-            //Sort the entries by the lower then by the upper value of their rectangles
+            //Sort the entries by the lower and then by the upper value of their rectangles
             ArrayList<NodeEntry> sortLower = sortByDimension(entries,i,"lower");
             ArrayList<NodeEntry> sortUpper = sortByDimension(entries,i,"upper");
 
@@ -556,7 +560,7 @@ public class RStarTree
     public void reInsert(Node parent, NodeEntry parentEntry, Node N) throws IOException, ClassNotFoundException {
         //RI1: For all M+1 entries of a node N, compute the distance between the centers of their rectangles and the center of the bounding rectangle N
         //RI2: Sort the entries in decreasing order of their distances computed in RI1
-        ArrayList<NodeEntry> sorted = sortbyCenterDistance(N.getEntries(),parentEntry);
+        ArrayList<NodeEntry> sorted = sortByCenterDistance(N.getEntries(),parentEntry);
         //RI3: Remove the first p entries from N and adjust the bounding rectangle of N
         ArrayList<NodeEntry> removed = new ArrayList<>();
         for (int i=sorted.size()-REINSERT_ENTRIES;i<sorted.size();i++)
@@ -579,13 +583,13 @@ public class RStarTree
     }
 
     /**
-     * Auxiliary function that sortes the entries of a Node base on the distance between their MBRs and the MBR of the parent Node.
+     * Auxiliary function that sorts the entries of a Node base on the distance between their MBRs and the MBR of the parent Node.
      * The function sorts in increasing order and the distance is Euclidean.
      * @param entries the entries of the Node.
      * @param parent the parent Node
      * @return an ArrayList with the entries sorted by the distance.
      */
-    private static ArrayList<NodeEntry> sortbyCenterDistance(ArrayList<NodeEntry> entries, NodeEntry parent)
+    private static ArrayList<NodeEntry> sortByCenterDistance(ArrayList<NodeEntry> entries, NodeEntry parent)
     {
         HashMap<Double,NodeEntry> hashEntries = new HashMap<>();
         for (NodeEntry entry : entries)
