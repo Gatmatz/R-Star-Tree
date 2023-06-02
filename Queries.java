@@ -7,10 +7,10 @@ public class Queries {
      * Function that executes all queries and then prints out the time results.
      */
     public void all() throws IOException, ClassNotFoundException {
-        LinearNearestNeighbours();
-        //NearestNeighboursQuery();
-        LinearRangeQueryRadius();
-        RangeRadiusQuery();
+//        LinearNearestNeighbours();
+//        //NearestNeighboursQuery();
+//        LinearRangeQueryRadius();
+//        RangeRadiusQuery();
         LinearRangeQueryMBR();
         RangeMBRQuery();
         //Skyline();
@@ -81,8 +81,8 @@ public class Queries {
 
 
     public void LinearRangeQueryMBR(){
-        Bounds b1= new Bounds(41.234,41.4);
-        Bounds b2= new Bounds(26.567,26.6);
+        Bounds b1= new Bounds(41.0,41.5);
+        Bounds b2= new Bounds(25.0,26.5);
         ArrayList<Bounds> BR= new ArrayList<>();
         BR.add(b1);
         BR.add(b2);
@@ -96,15 +96,15 @@ public class Queries {
         System.out.println("Linear Range Query Minimum Bounding Rectangle execution time: " + execution + " milliseconds");
 
         DataBlock block0 = DataFile.readDataFileBlock(0);
-        int nofRec = (int) block0.records.get(1).id;
-        System.out.println(nofRec);
+//        int nofRec = (int) block0.records.get(1).id;
+//        System.out.println(nofRec);
         System.out.println();
 
     }
 
     public void RangeMBRQuery() throws IOException, ClassNotFoundException {
-        Bounds b1= new Bounds(41.234,41.4);
-        Bounds b2= new Bounds(26.567,26.6);
+        Bounds b1= new Bounds(41.0,41.5);
+        Bounds b2= new Bounds(25.0,26.5);
         ArrayList<Bounds> BR= new ArrayList<>();
         BR.add(b1);
         BR.add(b2);

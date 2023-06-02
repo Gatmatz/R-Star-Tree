@@ -17,17 +17,24 @@ public class RangeRadiusQuery {
         qualifyingRecordIds=new ArrayList<>();
     }
 
+    /**
+     * Function used for executing a range query withing a specific circle with the use of the R* Tree.
+     * Searches for records within searchPoint's radius.
+     * @param node the R* tree' s root.
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public void create(Node node) throws IOException, ClassNotFoundException {
         if (node.getLevel()!=RStarTree.getLeafLevel()) {
             for (NodeEntry entry : node.getEntries()) {
-                if (entry.getMBR().checkOverLapWithPoint(searchPoint, pointRadius)) {
+                if (entry.getMBR().checkOverlapFromPoint(searchPoint, pointRadius)) {
                     if (IndexFile.readIndexBlock(entry.getChildPtr())!=null)
                         create(IndexFile.readIndexBlock(entry.getChildPtr()));
                 }
             }
         }else{
             for (NodeEntry entry: node.getEntries()){
-                if (entry.getMBR().checkOverLapWithPoint(searchPoint,pointRadius))
+                if (entry.getMBR().checkOverlapFromPoint(searchPoint,pointRadius))
                 {
                     Leaf leafEntry = (Leaf) entry;
                     qualifyingRecordIds.add(leafEntry.getRecordID());

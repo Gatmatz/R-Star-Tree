@@ -3,18 +3,18 @@ import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        //Make datafile
-        String csvPath = "data/map2_processed.csv";
+//        //Make datafile
+        String csvPath = "data/map_processed.csv";
         String dataFilePath = "files/datafile.txt";
         DataFile df= new DataFile(csvPath,dataFilePath);
         df.createDatafile();
-        //Make RStar-Tree
+//        Make RStar-Tree
         String indexFilePath = "files/indexfile.txt";
         IndexFile di = new IndexFile(indexFilePath);
         RStarTree tree = new RStarTree();
-//        tree.insertLinear();
-        RStarTree.bulkLoad();
-        testNoEntries();
+        tree.insertLinear();
+//      RStarTree.bulkLoad();
+//      testNoEntries();
         Queries queries = new Queries();
         queries.all();
     }

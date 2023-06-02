@@ -65,15 +65,14 @@ public class MBR implements Serializable {
     }
 
     /**
-     * Checks if
-     * @param searchPoint
-     * @param pointRadius
-     * @return
+     * Calculates the distance between the search point and MBR for its dimension.
+     * @param searchPoint the point for which I am performing a range query.
+     * @return the double distance between MBR and search point.
      */
-    public boolean checkOverLapWithPoint(ArrayList<Double> searchPoint, double pointRadius) {
-        double dist=0, point;
-        int size=DataFile.getNofCoordinates();
-        for (int i=0;i<size;i++) {
+    public double calculateDistanceFromPoint(ArrayList<Double> searchPoint) {
+        double dist = 0, point;
+        int size = DataFile.getNofCoordinates();
+        for (int i = 0; i < size; i++) {
             if (getBounds().get(i).getLower() > searchPoint.get(i))
                 point = getBounds().get(i).getLower();
             else if (getBounds().get(i).getUpper() < searchPoint.get(i))
@@ -82,8 +81,18 @@ public class MBR implements Serializable {
                 point = searchPoint.get(i);
             dist += (searchPoint.get(i) - point) * (searchPoint.get(i) - point);
         }
-        dist=Math.sqrt(dist);
-        if (dist<= pointRadius)
+        dist = Math.sqrt(dist);
+        return dist;
+    }
+
+    /**
+     * Checks if an MBR belongs to circle.
+     * @param searchPoint the point for which I am performing a range query.
+     * @param pointRadius the circle' s radius.
+     * @return true if the circle with radius=pointRadius overlaps the MBR.
+     */
+    public boolean checkOverlapFromPoint(ArrayList<Double> searchPoint, double pointRadius){
+        if (calculateDistanceFromPoint(searchPoint) <= pointRadius)
             return true;
         else
             return false;

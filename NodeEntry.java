@@ -283,10 +283,37 @@ public class NodeEntry implements Serializable
      */
     public static boolean getOverlapBoolean(MBR currentMBR, MBR newMBR)
     {
+        if (currentMBR.area.compareTo(0.0)==0)
+        {
+            if (pointInMBR(currentMBR,newMBR))
+                return true;
+            else
+                return false;
+        }
         if (getOverlap(currentMBR, newMBR)==0) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Checks if an MBR is inside or in the borders of the search MBR.
+     * @param currentMBR the entry' s MBR.
+     * @param searchMBR the MBR for which I am performing a range query.
+     * @return true if the currentMBR is inside or in borders of the searchMBR.
+     */
+    public static boolean pointInMBR(MBR currentMBR, MBR searchMBR){
+        int n=0;
+        int size = DataFile.getNofCoordinates();
+        for (int i = 0; i < size; i++) {
+            if (currentMBR.getBounds().get(i).getUpper() <= searchMBR.getBounds().get(i).getUpper() && currentMBR.getBounds().get(i).getUpper() >= searchMBR.getBounds().get(i).getLower()){
+                n++;
+            }
+        }
+        if (n==size)
+            return true;
+        else
+            return false;
     }
 
     /**

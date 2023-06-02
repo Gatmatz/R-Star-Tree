@@ -14,6 +14,13 @@ public class RangeMBRQuery {
         qualifyingRecordIds = new ArrayList<>();
     }
 
+    /**
+     * Function used for executing a range query withing a specific MBR with the use of the R* Tree
+     * Searches for records within that searchMBR.
+     * @param node the R* tree' s root.
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public void create(Node node) throws IOException, ClassNotFoundException {
         //if node is not a leaf.
         if (node.getLevel()!=RStarTree.getLeafLevel()){
