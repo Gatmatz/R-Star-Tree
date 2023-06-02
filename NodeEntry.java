@@ -251,6 +251,14 @@ public class NodeEntry implements Serializable
         return overlap;
     }
 
+    public static boolean getOverlapBoolean(MBR currentMBR, MBR newMBR)
+    {
+        if (getOverlap(currentMBR, newMBR)<0) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Function that computes the Euclidean distance between the centers of 2 MBRs.
      * @param A one MBR
