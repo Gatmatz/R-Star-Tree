@@ -39,7 +39,6 @@ public class MBR implements Serializable {
     /**
      * Function that calculates the perimeter of MBR.
      * The perimeter of an MBR is the sum of lengths of the edges.
-     *
      * @return the perimeter of the MBR
      */
     public Double calculatePerimeter() {
@@ -63,5 +62,30 @@ public class MBR implements Serializable {
             center.add(middle);
         }
         return center;
+    }
+
+    /**
+     * Checks if
+     * @param searchPoint
+     * @param pointRadius
+     * @return
+     */
+    public boolean checkOverLapWithPoint(ArrayList<Double> searchPoint, double pointRadius) {
+        double dist=0, point;
+        int size=DataFile.getNofCoordinates();
+        for (int i=0;i<size;i++) {
+            if (getBounds().get(i).getLower() > searchPoint.get(i))
+                point = getBounds().get(i).getLower();
+            else if (getBounds().get(i).getUpper() < searchPoint.get(i))
+                point = getBounds().get(i).getUpper();
+            else
+                point = searchPoint.get(i);
+            dist += (searchPoint.get(i) - point) * (searchPoint.get(i) - point);
+        }
+        dist=Math.sqrt(dist);
+        if (dist<= pointRadius)
+            return true;
+        else
+            return false;
     }
 }

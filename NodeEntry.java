@@ -207,26 +207,6 @@ public class NodeEntry implements Serializable
     }
 
     /**
-     * Auxiliary function that computes the sum of overlap of an entry Ek with the ArrayList entries.
-     * k index shows the index of Ek in the entries ArrayList, so it can be excluded from calculation.
-     * @param Ek the entry we want to calculate the overlap
-     * @param entries the entries in a Node
-     * @param k the index of Ek in the ArrayList entries
-     * @return the sum of overlaps of entry Ek
-     */
-    public static double findSumOverlap(NodeEntry Ek, ArrayList<NodeEntry> entries, int k)
-    {
-        double sum = 0;
-        for (int i=0;i<entries.size();i++)
-        {
-            if (i != k)
-            {
-                sum += getOverlap(Ek.getMBR(),entries.get(i).getMBR());
-            }
-        }
-        return sum;
-    }
-    /**
      * Auxiliary function that parses through the node entries of a node and finds the node with the smallest plus overlap for the addition on new Data.
      * @param entries an ArrayList with the current entries in the node
      * @param newData a new node entry to be inserted
@@ -238,12 +218,8 @@ public class NodeEntry implements Serializable
         NodeEntry minEntry = null;
         for (NodeEntry entry : entries)
         {
-            //Add the data to be inserted to current entry
-            MBR merged = new MBR(mergeMBR(entry.getMBR(),newData.getMBR()));
-            NodeEntry entryMerged = new NodeEntry(merged);
-
             //Calculate the merged MBR with the addition of new Data and compute the plus area that will be needed.
-            double overlap = findSumOverlap(entryMerged,entries,entries.indexOf(entry));
+            double overlap = getOverlap(entry.getMBR(),newData.getMBR());
             if (overlap<min) {
                 minEntry = entry;
                 min = overlap;
@@ -275,16 +251,9 @@ public class NodeEntry implements Serializable
         return overlap;
     }
 
-    /**
-     * Function that checks of two MBRs overlap each other.
-     * The function uses the overlap calculation function to determine if overlap exists.
-     * @param currentMBR one MBR
-     * @param newMBR another MBR
-     * @return true if the two MBRs overlap each other, false otherwise.
-     */
     public static boolean getOverlapBoolean(MBR currentMBR, MBR newMBR)
     {
-        if (getOverlap(currentMBR, newMBR)==0) {
+        if (getOverlap(currentMBR, newMBR)<0) {
             return false;
         }
         return true;

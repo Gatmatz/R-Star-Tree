@@ -15,7 +15,10 @@ public class Main {
 //        tree.insertLinear();
         RStarTree.bulkLoad();
         testNoEntries();
+        Queries queries = new Queries();
+        queries.all();
     }
+
     public static void testNoEntries() throws IOException, ClassNotFoundException {
         System.out.println(DataFile.getNofBlocks());
         System.out.println("Actual number of records: "+ DataFile.records.size());

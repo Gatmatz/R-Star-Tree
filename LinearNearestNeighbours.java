@@ -35,18 +35,17 @@ public class LinearNearestNeighbours implements Serializable {
             recordsInBlock= block.records;
             if (recordsInBlock != null) {
                 for (Record record : recordsInBlock) {
-                    double distance=calculateDistanceFromPoint(record,searchPoint);
-                    LinearNeighboursInfo neighbour=new LinearNeighboursInfo(record.id, distance);
+                    double distance = calculateDistanceFromPoint(record, searchPoint);
+                    LinearNeighboursInfo neighbour = new LinearNeighboursInfo(record.id, distance);
                     counter++;
-                    if (counter<=k){
+                    if (counter <= k) {
                         nearestNeighbours.add(neighbour);
-                    }else{
-                        MaxHeapForLinearNearestNeighbours max= new MaxHeapForLinearNearestNeighbours(nearestNeighbours,k);
-                        nearestNeighbours= max.findMax(neighbour);
+                    } else {
+                        MaxHeapForLinearNearestNeighbours max = new MaxHeapForLinearNearestNeighbours(nearestNeighbours, k);
+                        nearestNeighbours = max.findMax(neighbour);
                     }
                 }
-            }else
-                throw new IllegalStateException("Could not read records properly from the datafile");
+            }
             blockId++;
         }
     }

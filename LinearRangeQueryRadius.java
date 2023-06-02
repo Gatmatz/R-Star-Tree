@@ -37,8 +37,7 @@ public class LinearRangeQueryRadius {
                         qualifyingRecordIds.add(record.getId());
                     }
                 }
-            }else
-                throw new IllegalStateException("Can't read records from datafile.");
+            }
             blockId++;
         }
     }

@@ -1,15 +1,15 @@
 import java.util.ArrayList;
 
-public class LinearRangeQueryBoundingBox {
-    private ArrayList<Bounds> searchBoundingBox;
+public class LinearRangeQueryMBR {
+    private ArrayList<Bounds> searchMBR;
     private ArrayList<Long> qualifyingRecordIds;
 
     /**
      * The constructor of a point for which I run a range query withing a specific bounding box.
      * @param bounds the bounds of the search Bounding Box.
      */
-    LinearRangeQueryBoundingBox(ArrayList<Bounds> bounds) {
-        searchBoundingBox = bounds;
+    LinearRangeQueryMBR(ArrayList<Bounds> bounds) {
+        searchMBR = bounds;
         qualifyingRecordIds = new ArrayList<>();
     }
 
@@ -29,13 +29,12 @@ public class LinearRangeQueryBoundingBox {
             recordsInBlock = block.records;
             if (recordsInBlock != null) {
                 for (Record record : recordsInBlock) {
-                    if (check(searchBoundingBox, record)) {
+                    if (check(searchMBR, record)) {
                         qualifyingRecordIds.add(record.getId());
                     }
 
                 }
-            } else
-                throw new IllegalStateException("Can't read records from datafile.");
+            }
             blockId++;
         }
     }
@@ -58,15 +57,15 @@ public class LinearRangeQueryBoundingBox {
 
     /**
      * Checks if a record type Record is inside the bounding box.
-     * @param searchBoundingBox the bounding box for which I am reviewing the points.
+     * @param searchMBR the bounding box for which I am reviewing the points.
      * @param record the record for which I check if it is inside the bounding box.
      * @return true if the point is in the rectangle, else false.
      */
-    public boolean check(ArrayList<Bounds> searchBoundingBox, Record record) {
+    public boolean check(ArrayList<Bounds> searchMBR, Record record) {
         int size = DataFile.getNofCoordinates();
         int counter = 0;
         for (int i = 0; i < size; i++) {
-            if (record.getCoordinates().get(i) >= searchBoundingBox.get(i).getLower() && record.getCoordinates().get(i) <= searchBoundingBox.get(i).getUpper())
+            if (record.getCoordinates().get(i) >= searchMBR.get(i).getLower() && record.getCoordinates().get(i) <= searchMBR.get(i).getUpper())
                 counter++;
         }
         if (counter == size)

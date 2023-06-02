@@ -190,6 +190,8 @@ public class RStarTree
         return IndexFile.readIndexBlock(1);
     }
 
+    static int getLeafLevel(){return LEAF_LEVEL;}
+
     /**
      * ChooseSubtree implementation of RStar-Tree paper that picks the best fit for a NodeEntry in the current Node.
      * There is not a recursion, because the recursion is on recursiveInsert function.
