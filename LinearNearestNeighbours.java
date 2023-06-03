@@ -54,9 +54,15 @@ public class LinearNearestNeighbours implements Serializable {
      * Prints k nearest neighbors.
      */
     public void print(){
+//        for (LinearNeighboursInfo a:nearestNeighbours){
+//            System.out.println("id="+a.getRecordId()+" distance="+ a.getDistance());
+//        }
+        int i=0;
         for (LinearNeighboursInfo a:nearestNeighbours){
-            System.out.println("id="+a.getRecordId()+" distance="+ a.getDistance());
+            //System.out.println("id="+a.getRecordId()+" distance="+ a.getDistance());
+            i++;
         }
+        System.out.println(i);
     }
 
     /**

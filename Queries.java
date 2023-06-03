@@ -7,13 +7,13 @@ public class Queries {
      * Function that executes all queries and then prints out the time results.
      */
     public void all() throws IOException, ClassNotFoundException {
-//        LinearNearestNeighbours();
-//        //NearestNeighboursQuery();
+        LinearNearestNeighbours();
+        NearestNeighboursQuery();
 //        LinearRangeQueryRadius();
 //        RangeRadiusQuery();
-        LinearRangeQueryMBR();
-        RangeMBRQuery();
-        //Skyline();
+//        LinearRangeQueryMBR();
+//        RangeMBRQuery();
+//        //Skyline();
     }
 
     /**
@@ -23,40 +23,40 @@ public class Queries {
         ArrayList<Double> pointCoordinates= new ArrayList<>();
         pointCoordinates.add(22.7165525);
         pointCoordinates.add(37.6839478);
-        LinearNearestNeighbours a=new LinearNearestNeighbours(3, pointCoordinates);
-        long startTimenn=System.nanoTime();
+        LinearNearestNeighbours a=new LinearNearestNeighbours(140, pointCoordinates);
+        long startTime=System.nanoTime();
         a.create();
-        long endTimenn = System.nanoTime();
-        double execution=(double) (endTimenn - startTimenn) / 1000000;
+        long endTime= System.nanoTime();
+        double execution=(double) (endTime - startTime) / 1000000;
         a.print();
         System.out.println("Linear Nearest Neighbours execution time: " + execution + " milliseconds");
         System.out.println();
     }
 
-    /*public void NearestNeighboursQuery() throws IOException, ClassNotFoundException {
+    public void NearestNeighboursQuery() throws IOException, ClassNotFoundException {
         ArrayList<Double> pointCoordinates= new ArrayList<>();
         pointCoordinates.add(22.7165525);
         pointCoordinates.add(37.6839478);
-        NearestNeighboursQuery a=new NearestNeighboursQuery(3, pointCoordinates);
-        long startTimenn=System.nanoTime();
+        NearestNeighboursQuery a=new NearestNeighboursQuery(140, pointCoordinates);
+        long startTime=System.nanoTime();
         Node node=IndexFile.readIndexBlock(1);
         a.create(node);
-        long endTimenn = System.nanoTime();
-        double execution=(double) (endTimenn - startTimenn) / 1000000;
+        long endTime = System.nanoTime();
+        double execution=(double) (endTime- startTime) / 1000000;
         a.print();
-        System.out.println("Linear Nearest Neighbours execution time: " + execution + " milliseconds");
+        System.out.println("R* Tree Nearest Neighbours execution time: " + execution + " milliseconds");
         System.out.println();
-    }*/
+    }
 
     public void LinearRangeQueryRadius(){
         ArrayList<Double> pointCoordinates= new ArrayList<>();
         pointCoordinates.add(41.5031784);
         pointCoordinates.add(26.5323722);
         LinearRangeQueryRadius a=new LinearRangeQueryRadius(0.0005, pointCoordinates);
-        long startTimerqr=System.nanoTime();
+        long startTimer=System.nanoTime();
         a.create();
-        long endTimerqr = System.nanoTime();
-        double execution=(double) (endTimerqr - startTimerqr) / 1000000;
+        long endTimer = System.nanoTime();
+        double execution=(double) (endTimer - startTimer) / 1000000;
         a.print();
         a.printSize();
         System.out.println("Linear Range Query Radius execution time: " + execution + " milliseconds");
@@ -68,11 +68,11 @@ public class Queries {
         pointCoordinates.add(41.5031784);
         pointCoordinates.add(26.5323722);
         RangeRadiusQuery a=new RangeRadiusQuery(0.0005, pointCoordinates);
-        long startTimerqr=System.nanoTime();
+        long startTimer=System.nanoTime();
         Node node=IndexFile.readIndexBlock(1);
         a.create(node);
-        long endTimerqr = System.nanoTime();
-        double execution=(double) (endTimerqr - startTimerqr) / 1000000;
+        long endTimer = System.nanoTime();
+        double execution=(double) (endTimer - startTimer) / 1000000;
         a.print();
         a.printSize();
         System.out.println("R* Tree Range Query Radius execution time: " + execution + " milliseconds");
@@ -87,10 +87,10 @@ public class Queries {
         BR.add(b1);
         BR.add(b2);
         LinearRangeQueryMBR a=new LinearRangeQueryMBR(BR);
-        long startTimerqb=System.nanoTime();
+        long startTimer=System.nanoTime();
         a.create();
-        long endTimerqb = System.nanoTime();
-        double execution=(double) (endTimerqb - startTimerqb) / 1000000;
+        long endTimer = System.nanoTime();
+        double execution=(double) (endTimer - startTimer) / 1000000;
         //a.print();
         a.printSize();
         System.out.println("Linear Range Query Minimum Bounding Rectangle execution time: " + execution + " milliseconds");
@@ -110,11 +110,11 @@ public class Queries {
         BR.add(b2);
         MBR MBR1= new MBR(BR);
         RangeMBRQuery a=new RangeMBRQuery(MBR1);
-        long startTimerqb=System.nanoTime();
+        long startTimer=System.nanoTime();
         Node node=IndexFile.readIndexBlock(1);
         a.create(node);
-        long endTimerqb = System.nanoTime();
-        double execution=(double) (endTimerqb - startTimerqb) / 1000000;
+        long endTimer = System.nanoTime();
+        double execution=(double) (endTimer - startTimer) / 1000000;
         //a.print();
         a.printSize();
         System.out.println("R* Tree Range Query Minimum Bounding Rectangle execution time: " + execution + " milliseconds");
