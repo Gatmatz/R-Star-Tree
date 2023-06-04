@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public class LinearNearestNeighbours implements Serializable {
     public int k;
     public ArrayList<Double> searchPoint;
-    public ArrayList<LinearNeighboursInfo> nearestNeighbours;
+    public ArrayList<NearestNeighboursInfo> nearestNeighbours;
 
     /**
      * Τhe constructor of a point whose k nearest neighbors I want to find.
@@ -36,7 +36,7 @@ public class LinearNearestNeighbours implements Serializable {
             if (recordsInBlock != null) {
                 for (Record record : recordsInBlock) {
                     double distance = calculateDistanceFromPoint(record, searchPoint);
-                    LinearNeighboursInfo neighbour = new LinearNeighboursInfo(record.id, distance);
+                    NearestNeighboursInfo neighbour = new NearestNeighboursInfo(record.id, distance);
                     counter++;
                     if (counter <= k) {
                         nearestNeighbours.add(neighbour);
@@ -58,8 +58,8 @@ public class LinearNearestNeighbours implements Serializable {
 //            System.out.println("id="+a.getRecordId()+" distance="+ a.getDistance());
 //        }
         int i=0;
-        for (LinearNeighboursInfo a:nearestNeighbours){
-            //System.out.println("id="+a.getRecordId()+" distance="+ a.getDistance());
+        for (NearestNeighboursInfo a:nearestNeighbours){
+            //System.out.println("id="+a.getRecordId()+" distance="+ a.getMinDistance());
             i++;
         }
         System.out.println(i);
@@ -77,7 +77,6 @@ public class LinearNearestNeighbours implements Serializable {
         for (int i=0;i<size;i++){
             dist+=(p.get(i)-a.coordinates.get(i))*(p.get(i)-a.coordinates.get(i));
         }
-        //System.out.println("id="+a.id+" distance="+dist);
         return Math.sqrt(dist);
     }
 }

@@ -4,20 +4,20 @@ public class MaxHeapForLinearNearestNeighbours {
     private double[] Heap;
     private int size;
     private int maxsize;
-    public ArrayList<LinearNeighboursInfo> nearestNeighbours;
+    public ArrayList<NearestNeighboursInfo> nearestNeighbours;
 
 
     /**
      * Constructor to initialize an empty max heap with given maximum capacity.
      */
-    public MaxHeapForLinearNearestNeighbours(ArrayList<LinearNeighboursInfo> nearest, int maxsize)
+    public MaxHeapForLinearNearestNeighbours(ArrayList<NearestNeighboursInfo> nearest, int maxsize)
     {
         // This keyword refers to current instance itself
         this.maxsize = maxsize;
         this.size = 0;
         Heap = new double[this.maxsize];
-        for (LinearNeighboursInfo a: nearest){
-            insert(a.distance);
+        for (NearestNeighboursInfo a: nearest){
+            insert(a.minDistance);
         }
         nearestNeighbours=new ArrayList<>();
         nearestNeighbours.addAll(nearest);
@@ -64,13 +64,13 @@ public class MaxHeapForLinearNearestNeighbours {
      * @param neighbour the point I want to insert to nearestNeighbours.
      * @return the renewed ArrayList nearestNeighbours.
      */
-    public ArrayList<LinearNeighboursInfo> findMax(LinearNeighboursInfo neighbour)
+    public ArrayList<NearestNeighboursInfo> findMax(NearestNeighboursInfo neighbour)
     {
         double popped = Heap[0];
-        if (popped>neighbour.getDistance()) {
+        if (popped>neighbour.getMinDistance()) {
             Heap[0] = Heap[--size];
             for (int i = 0; i < nearestNeighbours.size(); i++) {
-                if (nearestNeighbours.get(i).getDistance()==popped) {
+                if (nearestNeighbours.get(i).getMinDistance()==popped) {
                     nearestNeighbours.remove(nearestNeighbours.get(i));
                 }
             }

@@ -1,9 +1,11 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-//        //Make datafile
+        //Make datafile
         String csvPath = "data/map_processed.csv";
         String dataFilePath = "files/datafile.txt";
         DataFile df= new DataFile(csvPath,dataFilePath);
@@ -40,4 +42,6 @@ public class Main {
         }
         System.out.println("Number of records in indexFile: "+ count);
     }
+
+
 }

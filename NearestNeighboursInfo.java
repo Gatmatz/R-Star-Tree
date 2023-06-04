@@ -1,6 +1,7 @@
-public class LinearNeighboursInfo {
+public class NearestNeighboursInfo {
     public long recordId;
-    public double distance;
+    public double minDistance;
+    public double minMaxDistance;
 
     /**
      * A constructor that holds some characteristics of a record such as
@@ -8,17 +9,17 @@ public class LinearNeighboursInfo {
      * @param recordId record ID.
      * @param distance the distance of two points.
      */
-    LinearNeighboursInfo(long recordId, double distance){
+    NearestNeighboursInfo(long recordId, double distance){
         this.recordId=recordId;
-        this.distance=distance;
+        this.minDistance=distance;
     }
 
     /**
      * Gets the distance of two points.
      * @return double distance of two points.
      */
-    public double getDistance(){
-        return distance;
+    public double getMinDistance(){
+        return minDistance;
     }
 
     /**

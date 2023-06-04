@@ -7,7 +7,7 @@ public class Queries {
      * Function that executes all queries and then prints out the time results.
      */
     public void all() throws IOException, ClassNotFoundException {
-        LinearNearestNeighbours();
+        //LinearNearestNeighbours();
         NearestNeighboursQuery();
 //        LinearRangeQueryRadius();
 //        RangeRadiusQuery();
@@ -23,7 +23,7 @@ public class Queries {
         ArrayList<Double> pointCoordinates= new ArrayList<>();
         pointCoordinates.add(22.7165525);
         pointCoordinates.add(37.6839478);
-        LinearNearestNeighbours a=new LinearNearestNeighbours(140, pointCoordinates);
+        LinearNearestNeighbours a=new LinearNearestNeighbours(500, pointCoordinates);
         long startTime=System.nanoTime();
         a.create();
         long endTime= System.nanoTime();
@@ -37,10 +37,10 @@ public class Queries {
         ArrayList<Double> pointCoordinates= new ArrayList<>();
         pointCoordinates.add(22.7165525);
         pointCoordinates.add(37.6839478);
-        NearestNeighboursQuery a=new NearestNeighboursQuery(140, pointCoordinates);
+        NearestNeighboursQuery a=new NearestNeighboursQuery(500, pointCoordinates);
         long startTime=System.nanoTime();
         Node node=IndexFile.readIndexBlock(1);
-        a.create(node);
+        a.nearestNeighborSearch(node);
         long endTime = System.nanoTime();
         double execution=(double) (endTime- startTime) / 1000000;
         a.print();
