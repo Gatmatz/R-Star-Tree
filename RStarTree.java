@@ -186,7 +186,7 @@ public class RStarTree
      * Getter function that return the root Node
      * @return root Node object
      */
-    Node getRoot() throws IOException, ClassNotFoundException {
+    static Node getRoot() throws IOException, ClassNotFoundException {
         return IndexFile.readIndexBlock(1);
     }
 
@@ -605,5 +605,69 @@ public class RStarTree
             result.add(entry.getValue());
         }
         return result;
+    }
+
+    /**
+     * Given an R-tree whose root node is T, find the leaf node containing the index entry E.
+     * @param T current Node(is used for recursion)
+     * @param E search entry
+     * @return the Leaf that contains the entry E
+     */
+    private static Node findLeaf(Node T, NodeEntry E) throws IOException, ClassNotFoundException {
+        //[Search subtrees]
+        // If T is not a leaf
+        if (T.getLevel()!=RStarTree.getLeafLevel())
+        {
+            //Check each entry F of T to determine if FI overlaps EI
+            for (NodeEntry entry: T.getEntries())
+            {
+                if (NodeEntry.getOverlapBoolean(E.getMBR(),entry.getMBR()))
+                {
+                    //For each such entry invoke findLeaf on the tree whose root is pointed to by Fp until E is found
+                    //or all entries have been checked
+                    Node childNode = IndexFile.readIndexBlock(entry.getChildPtr());
+                    Node result = findLeaf(childNode,E);
+                    entry.fitEntries(result.getEntries());
+                    IndexFile.updateIndexBlock(T.getBlockID(),T);
+                    return result;
+                }
+
+            }
+        }
+        //[Search leaf node for record]
+        else
+        {
+            //Check each entry to see if it matches E
+            for (NodeEntry entry : T.getEntries())
+            {
+                //If E is found
+                if (NodeEntry.getOverlapBoolean(E.getMBR(),entry.getMBR()))
+                {
+                    T.getEntries().remove(entry);
+                    IndexFile.updateIndexBlock(T.getBlockID(),T);
+                    //Return T
+                    return T;
+                }
+            }
+        }
+        return null;
+    }
+    public static void delete(Record E) throws IOException, ClassNotFoundException
+    {
+        //Construct a Leaf with the given Record
+        ArrayList<Bounds> totalBounds = new ArrayList<>();
+        for (int i=0;i<DataFile.nofCoordinates;i++)
+        {
+            Bounds boundsOneD = new Bounds(E.coordinates.get(i),E.coordinates.get(i));
+            totalBounds.add(boundsOneD);
+        }
+        Leaf leafE = new Leaf(0,E.getId(),new MBR(totalBounds));
+
+        //D1:[Find node containing record]
+        //Invoke FindLeaf to locate the leaf node L containing E.
+        Node L = findLeaf(getRoot(),leafE);
+
+        //D3:[Propagate changes] Invoke CondenseTree, passing L
+
     }
 }
