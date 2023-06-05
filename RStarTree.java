@@ -115,7 +115,7 @@ public class RStarTree
     private static ArrayList<Node> buildBulkLevel(int level) throws IOException, ClassNotFoundException {
         //Get all nodes that need to be organised in the current level
         ArrayList<Node> nodesInLevel = new ArrayList<>();
-        for (int i=1;i<IndexFile.nofBlocks;i++)
+        for (int i=2;i<IndexFile.nofBlocks;i++)
         {
             Node nodeN = IndexFile.readIndexBlock(i);
             if (nodeN.getLevel() == level)
@@ -126,7 +126,7 @@ public class RStarTree
         //Create new nodes upwards
         int nodeIndex = 0; //keeps track of the index in current Node
         int nodeCounter = IndexFile.nofBlocks;
-        ArrayList<NodeEntry> entries = new ArrayList<>(); //stores the entries that will stored in a Node
+        ArrayList<NodeEntry> entries = new ArrayList<>(); //stores the entries that will be stored in a Node
         ArrayList<Node> upperNodes = new ArrayList<>(); //stores all the newly created nodes in the upper level
         while (nodeIndex < nodesInLevel.size())
         {
@@ -169,15 +169,15 @@ public class RStarTree
         bulkLoadLeaves();
         //Recursively create nodes upwards
         int currentLevel = LEAF_LEVEL;
-        ArrayList<Node> buildedLevels = buildBulkLevel(currentLevel);
+        ArrayList<Node> builtLevels = buildBulkLevel(currentLevel);
         currentLevel++;
-        while (buildedLevels.size() != 1)
+        while (builtLevels.size() != 1)
         {
-            buildedLevels = buildBulkLevel(currentLevel);
+            builtLevels = buildBulkLevel(currentLevel);
             currentLevel++;
         }
         //Update the root node
-        Node root = buildedLevels.get(0);
+        Node root = builtLevels.get(0);
         root.setBlockID(1);
         IndexFile.updateIndexBlock(1,root);
     }
@@ -222,7 +222,7 @@ public class RStarTree
                     else
                         break;
                 }
-                //From the entries in A, considering all entries in N, choose the entry whose rectangle needs least overlap enlargement
+                //From the entries in A, considering all entries in N, choose the entry whose rectangle needs the least overlap enlargement
                 bestPick = NodeEntry.findMinOverlap(A,data);
                 return bestPick;
             }
@@ -365,7 +365,7 @@ public class RStarTree
             }
 
             //CSA2: Choose the axis with the minimum S as split axis
-            if (minS > S)
+            if (Double.compare(minS,S)>0)
             {
                 minS = S;
                 bestDistributions = distributions;
@@ -391,7 +391,7 @@ public class RStarTree
             }
 
             //CSA2: Choose the axis with the minimum S as split axis
-            if (minS > S)
+            if (Double.compare(minS,S)>0)
             {
                 minS = S;
                 bestDistributions = distributions;
@@ -421,9 +421,9 @@ public class RStarTree
                 bestDistributionIndex = distributions.indexOf(distribution);
                 minArea = area;
             }
-            else if (minOverlap == overlap)
+            else if (Double.compare(minOverlap,overlap) == 0)
             {
-                if (minArea>area)
+                if (Double.compare(minArea,area)>0)
                 {
                     minArea = area;
                     bestDistributionIndex = distributions.indexOf(distribution);
@@ -461,7 +461,7 @@ public class RStarTree
     NodeEntry overFlowTreatment(Node parentOfN, NodeEntry parentEntryOfN, Node N) throws IOException, ClassNotFoundException {
         // If the level is not the root level and this is the first call of OverflowTreatment
         // in the given level during the insertion of one data rectangle, then reinsert
-        if (N.getBlockID() != RStarTree.getRootLevel() && !reInsertedLevels[N.getLevel()-1])
+        if (N.getBlockID() != RStarTree.getRoot().getBlockID() && !reInsertedLevels[N.getLevel()-1])
         {
             reInsertedLevels[N.getLevel()-1] = true; // Mark level as already inserted
             reInsert(parentOfN,parentEntryOfN,N);
@@ -593,43 +593,85 @@ public class RStarTree
      */
     private static ArrayList<NodeEntry> sortByCenterDistance(ArrayList<NodeEntry> entries, NodeEntry parent)
     {
-        HashMap<Double,NodeEntry> hashEntries = new HashMap<>();
+        HashMap<NodeEntry,Double> hashEntries = new HashMap<>();
         for (NodeEntry entry : entries)
         {
-            hashEntries.put(NodeEntry.getDistanceBetweenCenters(entry.getMBR(),parent.getMBR()),entry);
+            hashEntries.put(entry,NodeEntry.getDistanceBetweenCenters(entry.getMBR(),parent.getMBR()));
         }
-        TreeMap<Double, NodeEntry> sorted = new TreeMap<>(hashEntries);
-        ArrayList<NodeEntry> result = new ArrayList<>();
-        for (Map.Entry<Double,NodeEntry> entry : sorted.entrySet())
+        ArrayList<Double> sortedValues = new ArrayList<>();
+        for (Map.Entry<NodeEntry,Double> entry: hashEntries.entrySet())
+            sortedValues.add(entry.getValue());
+        sortedValues.sort(Double::compareTo);
+        LinkedHashMap<NodeEntry,Double> sortedMap = new LinkedHashMap<>();
+        for (Double value: sortedValues)
         {
-            result.add(entry.getValue());
+            for (Map.Entry<NodeEntry,Double> entry : hashEntries.entrySet())
+            {
+                if (entry.getValue().equals(value))
+                    sortedMap.put(entry.getKey(),value);
+            }
         }
+        ArrayList<NodeEntry> result = new ArrayList<>();
+        for(Map.Entry<NodeEntry, Double> entry :sortedMap.entrySet())
+            result.add(entry.getKey());
         return result;
     }
 
     /**
-     * Given an R-tree whose root node is T, find the leaf node containing the index entry E.
-     * @param T current Node(is used for recursion)
+     * Recursive delete algorithm that is based on the delete operation of R-Tree paper.
+     * The function executes findLeaf and CondenseTree together for optimization.
+     * FindLeaf: Given an R-tree whose root node is T, find the leaf node containing the index entry E.
+     * CondenseTree: Given a leaf node L from which an entry has been deleted, eliminate the node if it has too few
+     * entries and relocate its entries. Propagate node elimination upward as necessary.
+     * Adjust all covering rectangles on the path to the root, making them smaller if possible.
+     * @param parent current Node(is used for recursion)
      * @param E search entry
      * @return the Leaf that contains the entry E
      */
-    private static Node findLeaf(Node T, NodeEntry E) throws IOException, ClassNotFoundException {
+    private Node deleteRecursive(Node parent, NodeEntry E) throws IOException, ClassNotFoundException {
         //[Search subtrees]
         // If T is not a leaf
-        if (T.getLevel()!=RStarTree.getLeafLevel())
+        if (parent.getLevel()!=RStarTree.getLeafLevel())
         {
             //Check each entry F of T to determine if FI overlaps EI
-            for (NodeEntry entry: T.getEntries())
+            for (NodeEntry childEntry: parent.getEntries())
             {
-                if (NodeEntry.getOverlapBoolean(E.getMBR(),entry.getMBR()))
+                if (NodeEntry.getOverlapBoolean(E.getMBR(),childEntry.getMBR()))
                 {
                     //For each such entry invoke findLeaf on the tree whose root is pointed to by Fp until E is found
                     //or all entries have been checked
-                    Node childNode = IndexFile.readIndexBlock(entry.getChildPtr());
-                    Node result = findLeaf(childNode,E);
-                    entry.fitEntries(result.getEntries());
-                    IndexFile.updateIndexBlock(T.getBlockID(),T);
-                    return result;
+                    NodeEntry.getOverlapBoolean(E.getMBR(),childEntry.getMBR());
+                    Node childNode = IndexFile.readIndexBlock(childEntry.getChildPtr());
+                    childNode = deleteRecursive(childNode,E);
+                    //If the root node has only one child after the tree has been adjusted, make the child the new root
+                    if (parent.getLevel() == getRootLevel())
+                    {
+                        if (parent.getEntries().size() == 1)
+                        {
+                            Node newRoot = IndexFile.readIndexBlock(parent.getEntries().get(0).getChildPtr());
+                            newRoot.setBlockID(1);
+                            IndexFile.updateIndexBlock(1,newRoot);
+                        }
+                    }
+                    //If N has fewer than m entries, delete En from P and reinsert all entries of nodes.
+                    //Entries from eliminated leaf nodes are re-inserted in tree leaves, but entries from higher level
+                    //nodes must be placed higher in the tree, so that leaves of their dependent subtrees will be on
+                    //the same level as leaves of the main tree
+                    if (childNode.getEntries().size()<Node.minEntries)
+                    {
+                        parent.getEntries().remove(childEntry);
+                        for (NodeEntry entry : childNode.getEntries())
+                        {
+                            recursiveInsert(null,null,entry,childNode.getLevel());
+                        }
+                    }
+                    //If N has not been eliminated, adjust EnI to tightly contain all entries in N.
+                    else
+                    {
+                        childEntry.fitEntries(childNode.getEntries());
+                    }
+                    IndexFile.updateIndexBlock(parent.getBlockID(),parent);
+                    return parent;
                 }
 
             }
@@ -638,23 +680,27 @@ public class RStarTree
         else
         {
             //Check each entry to see if it matches E
-            for (NodeEntry entry : T.getEntries())
+            for (NodeEntry entry : parent.getEntries())
             {
                 //If E is found
                 if (NodeEntry.getOverlapBoolean(E.getMBR(),entry.getMBR()))
                 {
-                    T.getEntries().remove(entry);
-                    IndexFile.updateIndexBlock(T.getBlockID(),T);
+                    parent.getEntries().remove(entry);
+                    IndexFile.updateIndexBlock(parent.getBlockID(),parent);
                     //Return T
-                    return T;
+                    return parent;
                 }
             }
         }
         return null;
     }
-    public static void delete(Record E) throws IOException, ClassNotFoundException
-    {
-        //Construct a Leaf with the given Record
+
+    /**
+     * Delete function that deletes a record E from the R*-Tree.
+     * The function creates a Leaf based on the record E and then calls the deleteRecursive function.
+     * @param E record to be deleted.
+     */
+    public void delete(Record E) throws IOException, ClassNotFoundException {
         ArrayList<Bounds> totalBounds = new ArrayList<>();
         for (int i=0;i<DataFile.nofCoordinates;i++)
         {
@@ -662,12 +708,6 @@ public class RStarTree
             totalBounds.add(boundsOneD);
         }
         Leaf leafE = new Leaf(0,E.getId(),new MBR(totalBounds));
-
-        //D1:[Find node containing record]
-        //Invoke FindLeaf to locate the leaf node L containing E.
-        Node L = findLeaf(getRoot(),leafE);
-
-        //D3:[Propagate changes] Invoke CondenseTree, passing L
-
+        deleteRecursive(getRoot(),leafE);
     }
 }
