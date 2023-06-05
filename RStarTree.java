@@ -54,7 +54,7 @@ public class RStarTree
      */
     private static void bulkLoadLeaves() throws IOException, ClassNotFoundException {
         //Sort the DataBlocks from the DataFile and save them to externalSort.txt
-        HilbertCurveSort.internalSort();
+//        HilbertCurveSort.internalSort();
         //Initialize counters for the filling of the Leafs
         int blockCounter = 1; //keeps track of the blocks in the Datafile
         int recordCounter = 0; //keeps track of the records in a specific DataBlock
