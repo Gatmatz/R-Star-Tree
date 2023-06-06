@@ -53,8 +53,9 @@ public class RStarTree
      * Auxiliary function that bulk-loads the records from the datafile to leaves.
      */
     private static void bulkLoadLeaves() throws IOException, ClassNotFoundException {
+        int comfortSize = (Node.maxEntries*80)/100;
         //Sort the DataBlocks from the DataFile and save them to externalSort.txt
-//        HilbertCurveSort.internalSort();
+        HilbertCurveSort.internalSort();
         //Initialize counters for the filling of the Leafs
         int blockCounter = 1; //keeps track of the blocks in the Datafile
         int recordCounter = 0; //keeps track of the records in a specific DataBlock
@@ -65,7 +66,7 @@ public class RStarTree
         while (blockCounter <=DataFile.getNofBlocks())
         {
             //If the current Node is full
-            if (nodeIndex == Node.maxEntries)
+            if (nodeIndex == comfortSize)
             {
                 //Write current node to the IndexFile
                 Node node = new Node(LEAF_LEVEL,entries);
@@ -112,17 +113,8 @@ public class RStarTree
      * @param level the current level of building
      * @return an ArrayList of the newly created nodes in the upper level
      */
-    private static ArrayList<Node> buildBulkLevel(int level) throws IOException, ClassNotFoundException {
-        //Get all nodes that need to be organised in the current level
-        ArrayList<Node> nodesInLevel = new ArrayList<>();
-        for (int i=2;i<IndexFile.nofBlocks;i++)
-        {
-            Node nodeN = IndexFile.readIndexBlock(i);
-            if (nodeN.getLevel() == level)
-            {
-                nodesInLevel.add(nodeN);
-            }
-        }
+    private static ArrayList<Node> buildBulkLevel(int level,ArrayList<Node> nodesInLevel){
+        int comfortSize = (Node.maxEntries*80)/100;
         //Create new nodes upwards
         int nodeIndex = 0; //keeps track of the index in current Node
         int nodeCounter = IndexFile.nofBlocks;
@@ -131,7 +123,7 @@ public class RStarTree
         while (nodeIndex < nodesInLevel.size())
         {
             //If node in upper level is full
-            if (entries.size() == Node.maxEntries)
+            if (entries.size() == comfortSize)
             {
                 //Create the node and write it to IndexFile
                 Node upperNode = new Node(level+1,entries);
@@ -168,16 +160,26 @@ public class RStarTree
         //Start from the leaves
         bulkLoadLeaves();
         //Recursively create nodes upwards
+        //Get all nodes that need to be organised in the leaf level
         int currentLevel = LEAF_LEVEL;
-        ArrayList<Node> builtLevels = buildBulkLevel(currentLevel);
-        currentLevel++;
-        while (builtLevels.size() != 1)
+        ArrayList<Node> nodesInLevel = new ArrayList<>();
+        for (int i=2;i<IndexFile.nofBlocks;i++)
         {
-            builtLevels = buildBulkLevel(currentLevel);
+            Node nodeN = IndexFile.readIndexBlock(i);
+            if (nodeN.getLevel() == currentLevel)
+            {
+                nodesInLevel.add(nodeN);
+            }
+        }
+        nodesInLevel = buildBulkLevel(currentLevel,nodesInLevel);
+        currentLevel++;
+        while (nodesInLevel.size() != 1)
+        {
+            nodesInLevel = buildBulkLevel(currentLevel,nodesInLevel);
             currentLevel++;
         }
         //Update the root node
-        Node root = builtLevels.get(0);
+        Node root = nodesInLevel.get(0);
         root.setBlockID(1);
         IndexFile.updateIndexBlock(1,root);
     }
