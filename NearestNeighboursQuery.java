@@ -1,6 +1,9 @@
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Java Class that represents the structure of the Nearest Neighbours Query withing the use of R* tree.
+ */
 public class NearestNeighboursQuery {
     public int k;
     public ArrayList<Double> searchPoint;
@@ -17,6 +20,10 @@ public class NearestNeighboursQuery {
         nearestNeighbours=new ArrayList<>();
     }
 
+    /**
+     * Function which finds the k nearest neighbors of the search point by using a branch and bound algorithm
+     * with the help of the R* Tree.
+     */
     public void nearestNeighborSearch(Node node) throws IOException, ClassNotFoundException {
         //if node is not a leaf.
         if (node.getLevel()!=RStarTree.getLeafLevel()) {
@@ -29,26 +36,20 @@ public class NearestNeighboursQuery {
                 ABL = downwardPruning(searchPoint,ABL);
             }
         }
-
-
         //if node is a leaf.
         else{
             for (NodeEntry entry: node.getEntries()){
                 Double distance = entry.getMBR().minDist(searchPoint);
                 if (nearestNeighbours.size()<k){
                     NearestNeighboursInfo neighbour= new NearestNeighboursInfo(getRecordId(entry),distance);
-                    neighbour.minMaxDistance = entry.getMBR().minMaxDist(searchPoint);
+                    //neighbour.minMaxDistance = entry.getMBR().minMaxDist(searchPoint);
                     nearestNeighbours.add(neighbour);
                     nearestNeighbours=sortNearestNeighbours(nearestNeighbours);
                 }else{
-                    if (sortNearestNeighbours(nearestNeighbours).get(k-1).getMinDistance()>distance) {
-                        for (int i = 0; i < nearestNeighbours.size(); i++) {
-                            if (nearestNeighbours.get(i).getMinDistance() == sortNearestNeighbours(nearestNeighbours).get(k-1).getMinDistance()) {
-                                nearestNeighbours.remove(nearestNeighbours.get(i));
-                            }
-                        }
+                    if (nearestNeighbours.get(k-1).getMinDistance()>distance) {
+                         nearestNeighbours.remove(nearestNeighbours.size()-1);
                         NearestNeighboursInfo neighbour= new NearestNeighboursInfo(getRecordId(entry),distance);
-                        neighbour.minMaxDistance = entry.getMBR().minMaxDist(searchPoint);
+                        //neighbour.minMaxDistance = entry.getMBR().minMaxDist(searchPoint);
                         nearestNeighbours.add(neighbour);
                         nearestNeighbours=sortNearestNeighbours(nearestNeighbours);
                     }
@@ -57,12 +58,23 @@ public class NearestNeighboursQuery {
         }
     }
 
+    /**
+     * Creates the node's ABL ArrayList which is an ArrayList containing the nodes of a Node Entry.
+     * @param node a specific node for which I create an ABL ArrayList.
+     * @return the ABL ArrayList<NodeEntry>.
+     */
     public ArrayList<NodeEntry> genBranchList(Node node){
         ArrayList<NodeEntry> ABL=new ArrayList<>();
         ABL.addAll(node.getEntries());
         return ABL;
     }
 
+    /**
+     * Sorts the ABL in ascending order.
+     * @param buffer the Node Entries I want to sort.
+     * @param searchPoint the point for which I want to find the k nearest neighbours.
+     * @return the sorted ABL ArrayList.
+     */
     public ArrayList<NodeEntry> sortABL(ArrayList<NodeEntry> buffer, ArrayList<Double> searchPoint){
         HashMap<NodeEntry,Double> hashEntries = new HashMap<>();
         for (NodeEntry entry : buffer)
@@ -88,6 +100,11 @@ public class NearestNeighboursQuery {
         return result;
     }
 
+    /**
+     * Sorts the nearest neighbors in ascending order.
+     * @param nearestNeighbours the ArrayList of the nearest neighbors.
+     * @return the sorted ArrayList of the nearest neighbors in ascending order.
+     */
     public ArrayList<NearestNeighboursInfo> sortNearestNeighbours(ArrayList<NearestNeighboursInfo> nearestNeighbours){
         HashMap<NearestNeighboursInfo,Double> hashEntries = new HashMap<>();
         for (NearestNeighboursInfo n : nearestNeighbours)
@@ -113,13 +130,20 @@ public class NearestNeighboursQuery {
         return result;
     }
 
+    /**
+     * Removes all the Node Entries which have bigger minDistance than the minDistance of the last nearest neighbour.
+     * The last nearest neighbour has the biggest minDistance from the other neighbours.
+     * @param searchPoint the point for which I want to find the k nearest neighbours.
+     * @param ABL the ABL I want to edit.
+     * @return the new ABL after the removes.
+     */
     public ArrayList<NodeEntry> downwardPruning(ArrayList<Double> searchPoint, ArrayList<NodeEntry> ABL){
         if (nearestNeighbours.size()==0)
             return ABL;
         NearestNeighboursInfo last= sortNearestNeighbours(nearestNeighbours).get(nearestNeighbours.size()-1);
         for(int i=ABL.size()-1;i>=0;i--){
             NodeEntry e=ABL.get(i);
-            if (e.getMBR().minDist(searchPoint)>last.minMaxDistance)
+            if (e.getMBR().minDist(searchPoint)>last.getMinDistance())
             {
                 ABL.remove(e);
             }
@@ -127,6 +151,11 @@ public class NearestNeighboursQuery {
         return ABL;
     }
 
+    /**
+     * Finds the record id of a specific NodeEntry.
+     * @param entry a NodeEntry for which I want to find the record id.
+     * @return the record id if record exists, else return 0.
+     */
     public long getRecordId(NodeEntry entry){
         if (entry instanceof Leaf){
             Leaf leafEntry=(Leaf) entry;
@@ -141,7 +170,7 @@ public class NearestNeighboursQuery {
     public void print(){
         int i=0;
         for (NearestNeighboursInfo a:nearestNeighbours){
-            //System.out.println("id="+a.getRecordId()+" distance="+ a.getMinDistance());
+            System.out.println("id="+a.getRecordId()+" distance="+ a.getSquareMinDistance());
             i++;
         }
         System.out.println(i);

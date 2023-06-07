@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 
+/**
+ * Java Class that represents the structure of the Sequential Radius Range Query.
+ */
 public class LinearRangeQueryRadius {
     private double pointRadius;
     private ArrayList<Double> searchPoint;

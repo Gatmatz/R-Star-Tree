@@ -1,6 +1,9 @@
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Java Class that represents the structure of the Radius Range Query withing the use of R* tree.
+ */
 public class RangeRadiusQuery {
     private double pointRadius;
     private ArrayList<Double> searchPoint;

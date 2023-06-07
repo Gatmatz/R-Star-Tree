@@ -1,7 +1,7 @@
 public class NearestNeighboursInfo {
     public long recordId;
     public double minDistance;
-    public double minMaxDistance;
+//    public double minMaxDistance;
 
     /**
      * A constructor that holds some characteristics of a record such as
@@ -23,10 +23,20 @@ public class NearestNeighboursInfo {
     }
 
     /**
+     * Gets the distance of two points with square.
+     * @return double distance of two points.
+     */
+    public double getSquareMinDistance(){
+        return Math.sqrt(minDistance);
+    }
+
+    /**
      * Gets the id of a specific record.
      * @return long record ID.
      */
     public long getRecordId() {
         return recordId;
     }
+
+
 }

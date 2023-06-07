@@ -1,6 +1,9 @@
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.*;
 
+/**
+ * Java Class that represents the structure of the Sequential Nearest Neighbours Query.
+ */
 public class LinearNearestNeighbours implements Serializable {
     public int k;
     public ArrayList<Double> searchPoint;
@@ -51,15 +54,43 @@ public class LinearNearestNeighbours implements Serializable {
     }
 
     /**
+     * Sorts the nearest neighbors in ascending order.
+     * @param nearestNeighbours the ArrayList of the nearest neighbors.
+     * @return the sorted ArrayList of the nearest neighbors in ascending order.
+     */
+    public ArrayList<NearestNeighboursInfo> sortNearestNeighbours(ArrayList<NearestNeighboursInfo> nearestNeighbours){
+        HashMap<NearestNeighboursInfo,Double> hashEntries = new HashMap<>();
+        for (NearestNeighboursInfo n : nearestNeighbours)
+        {
+            hashEntries.put(n, n.getMinDistance());
+        }
+        ArrayList<Double> sortedValues = new ArrayList<>();
+        for (Map.Entry<NearestNeighboursInfo,Double> entry: hashEntries.entrySet())
+            sortedValues.add(entry.getValue());
+        sortedValues.sort(Comparator.naturalOrder());
+        LinkedHashMap<NearestNeighboursInfo,Double> sortedMap = new LinkedHashMap<>();
+        for (Double value: sortedValues)
+        {
+            for (Map.Entry<NearestNeighboursInfo,Double> n : hashEntries.entrySet())
+            {
+                if (n.getValue().equals(value))
+                    sortedMap.put(n.getKey(),value);
+            }
+        }
+        ArrayList<NearestNeighboursInfo> result = new ArrayList<>();
+        for(Map.Entry<NearestNeighboursInfo,Double> n :sortedMap.entrySet())
+            result.add(n.getKey());
+        return result;
+    }
+
+    /**
      * Prints k nearest neighbors.
      */
     public void print(){
-//        for (LinearNeighboursInfo a:nearestNeighbours){
-//            System.out.println("id="+a.getRecordId()+" distance="+ a.getDistance());
-//        }
+        nearestNeighbours=sortNearestNeighbours(nearestNeighbours);
         int i=0;
         for (NearestNeighboursInfo a:nearestNeighbours){
-            //System.out.println("id="+a.getRecordId()+" distance="+ a.getMinDistance());
+            System.out.println("id="+a.getRecordId()+" distance="+ a.getMinDistance());
             i++;
         }
         System.out.println(i);

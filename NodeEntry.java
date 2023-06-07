@@ -11,6 +11,7 @@ public class NodeEntry implements Serializable
 {
     private long childPtr;
     private MBR minimumBoundingRectangle;
+
     NodeEntry(Node child)
     {
         childPtr = child.getBlockID();

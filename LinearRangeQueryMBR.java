@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 
+/**
+ * Java Class that represents the structure of the Sequential MBR Range Query.
+ */
 public class LinearRangeQueryMBR {
     private ArrayList<Bounds> searchMBR;
     private ArrayList<Long> qualifyingRecordIds;

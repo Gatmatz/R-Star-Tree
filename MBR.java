@@ -119,35 +119,35 @@ public class MBR implements Serializable {
                 point = searchPoint.get(i);
             dist += (searchPoint.get(i) - point) * (searchPoint.get(i) - point);
         }
-        return Math.sqrt(dist);
+        return dist;
     }
 
-    public double minMaxDist(ArrayList<Double> searchPoint) {
-        double rmk, rmi, a , b = 0, min = Double.MAX_VALUE;
-        int size = DataFile.getNofCoordinates();
-        for (int k = 0; k < size; k++) {
-            if (searchPoint.get(k) <= ((float)(getBounds().get(k).getLower() + getBounds().get(k).getUpper()) / 2))
-                rmk = getBounds().get(k).getLower();
-            else
-                rmk = getBounds().get(k).getUpper();
-            a = Math.pow(searchPoint.get(k) - rmk, 2);
-            for (int i = size - 1; i >= 0; i--) {
-                if (k != i) {
-                    if (searchPoint.get(i) >= ((float)(getBounds().get(i).getLower() + getBounds().get(i).getUpper()) / 2))
-                        rmi = getBounds().get(i).getLower();
-                    else
-                        rmi = getBounds().get(i).getUpper();
-                    b += Math.pow(searchPoint.get(i) - rmi, 2);
-                }
-            }
-            a=Math.sqrt(a);
-            b=Math.sqrt(b);
-            if (min > (a + b)) {
-                min = a + b;
-            }
-        }
-        return min;
-    }
+//    public double minMaxDist(ArrayList<Double> searchPoint) {
+//        double rmk, rmi, a , b = 0, min = Double.MAX_VALUE;
+//        int size = DataFile.getNofCoordinates();
+//        for (int k = 0; k < size; k++) {
+//            if (searchPoint.get(k) <= ((float)(getBounds().get(k).getLower() + getBounds().get(k).getUpper()) / 2))
+//                rmk = getBounds().get(k).getLower();
+//            else
+//                rmk = getBounds().get(k).getUpper();
+//            a = Math.pow(searchPoint.get(k) - rmk, 2);
+//            for (int i = size - 1; i >= 0; i--) {
+//                if (k != i) {
+//                    if (searchPoint.get(i) >= ((float)(getBounds().get(i).getLower() + getBounds().get(i).getUpper()) / 2))
+//                        rmi = getBounds().get(i).getLower();
+//                    else
+//                        rmi = getBounds().get(i).getUpper();
+//                    b += Math.pow(searchPoint.get(i) - rmi, 2);
+//                }
+//            }
+//            a=Math.sqrt(a);
+//            b=Math.sqrt(b);
+//            if (min > (a + b)) {
+//                min = a + b;
+//            }
+//        }
+//        return min;
+//    }
 
 
     }

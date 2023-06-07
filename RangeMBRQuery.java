@@ -1,6 +1,9 @@
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Java Class that represents the structure of the MBR Range Query withing the use of R* tree.
+ */
 public class RangeMBRQuery {
     private MBR searchMBR;
     private ArrayList<Long> qualifyingRecordIds;
