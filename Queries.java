@@ -7,13 +7,13 @@ public class Queries {
      * Function that executes all queries and then prints out the time results.
      */
     public void all() throws IOException, ClassNotFoundException {
-        LinearNearestNeighbours();
-        NearestNeighboursQuery();
+//        LinearNearestNeighbours();
+//        NearestNeighboursQuery();
 //        LinearRangeQueryRadius();
 //        RangeRadiusQuery();
 //        LinearRangeQueryMBR();
 //        RangeMBRQuery();
-//        //Skyline();
+        Skyline();
     }
 
     /**
@@ -119,4 +119,16 @@ public class Queries {
         a.printSize();
         System.out.println("R* Tree Range Query Minimum Bounding Rectangle execution time: " + execution + " milliseconds");
     }
+
+    public void Skyline() throws IOException, ClassNotFoundException {
+        Skyline s=new Skyline();
+        long startTimer=System.nanoTime();
+        Node node=IndexFile.readIndexBlock(1);
+        s.skylineSearch(node);
+        long endTimer = System.nanoTime();
+        double execution=(double) (endTimer - startTimer) / 1000000;
+        s.print();
+        System.out.println("R* Tree Skyline execution time: " + execution + " milliseconds");
+    }
+
 }
