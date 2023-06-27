@@ -32,7 +32,7 @@ public class Skyline {
                 pQueue.poll();
             }else{
                 if (pQueue.peek().getEntry().getChildPtr()!=0){
-                    Node nod=IndexFile.readIndexBlock(pQueue.peek().getEntry().getChildPtr());
+                    Node nod=IndexFile.readIndexBlock(pQueue.poll().getEntry().getChildPtr());
                     for (NodeEntry entry : nod.getEntries()) {
                         if (!isDominated(entry)){
                             double dist=minDist(entry.getMBR());
