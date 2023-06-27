@@ -11,8 +11,8 @@ public class IndexFile
     public static String indexFilePath;
     public static int nofBlocks; //Total blocks of indexFile
     static RandomAccessFile indexFile;
-
-    public IndexFile(String indexFilePath) throws IOException {
+    public IndexFile(String indexFilePath) throws IOException
+    {
         IndexFile.indexFilePath = indexFilePath;
         this.createIndexFile();
     }
@@ -22,7 +22,6 @@ public class IndexFile
         indexFile.setLength(0);
         IndexFile.nofBlocks = 1;
     }
-
     /**
      *  Function that serializes an object.
      * @param nblock Object class to be serialized

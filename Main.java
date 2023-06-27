@@ -1,7 +1,5 @@
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
@@ -10,20 +8,16 @@ public class Main {
         String dataFilePath = "files/datafile.txt";
         DataFile df= new DataFile(csvPath,dataFilePath);
         df.createDatafile();
-//        Make RStar-Tree
+        //Make RStar-Tree
         String indexFilePath = "files/indexfile.txt";
         IndexFile di = new IndexFile(indexFilePath);
         RStarTree tree = new RStarTree();
+//        RStarTree.bulkLoad();
         tree.insertLinear();
-//      RStarTree.bulkLoad();
-//      testNoEntries();
-        Queries queries = new Queries();
-        queries.all();
     }
-
     public static void testNoEntries() throws IOException, ClassNotFoundException {
         System.out.println(DataFile.getNofBlocks());
-        System.out.println("Actual number of records: "+ DataFile.records.size());
+        System.out.println("Actual number of records: "+ DataFile.nofRecords);
         ArrayList<DataBlock> blocks = DataFile.getBlocks();
         int counter = 0;
         for (DataBlock block : blocks)

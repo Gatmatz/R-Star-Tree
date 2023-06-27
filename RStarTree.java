@@ -30,6 +30,17 @@ public class RStarTree
         Node root = IndexFile.readIndexBlock(1);
         return root.getLevel();
     }
+
+    /**
+     * Getter function that return the root Node
+     * @return root Node object
+     */
+    static Node getRoot() throws IOException, ClassNotFoundException {
+        return IndexFile.readIndexBlock(1);
+    }
+
+    static int getLeafLevel(){return LEAF_LEVEL;}
+
     /**
      * Function that creates the RStar-tree by reading one-by-one blocks from the datafile
      * and inserting them to the tree.
@@ -183,16 +194,6 @@ public class RStarTree
         root.setBlockID(1);
         IndexFile.updateIndexBlock(1,root);
     }
-
-    /**
-     * Getter function that return the root Node
-     * @return root Node object
-     */
-    static Node getRoot() throws IOException, ClassNotFoundException {
-        return IndexFile.readIndexBlock(1);
-    }
-
-    static int getLeafLevel(){return LEAF_LEVEL;}
 
     /**
      * ChooseSubtree implementation of RStar-Tree paper that picks the best fit for a NodeEntry in the current Node.

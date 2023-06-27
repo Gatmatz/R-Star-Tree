@@ -24,6 +24,7 @@ public class DataFile {
         RECORD_SIZE = (int)block0.records.get(0).id;
         nofRecords = (int)block0.records.get(1).id;
         nofBlocks = (int) block0.records.get(2).id;
+        nofCoordinates = (int) block0.records.get(3).id;
     }
     public void createDatafile() throws IOException {
         this.readRecords(); //Read Records from CSV
@@ -122,6 +123,7 @@ public class DataFile {
         info.addRecord(new Record(RECORD_SIZE,new ArrayList<>()));
         info.addRecord(new Record(records.size(),new ArrayList<>()));
         info.addRecord(new Record(getNofBlocks(),new ArrayList<>()));
+        info.addRecord(new Record(nofCoordinates,new ArrayList<>()));
         try {
             byte[] nodeInBytes = serializeObject(info);
             byte[] block = new byte[DataFile.BLOCK_SIZE];
