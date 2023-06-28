@@ -40,7 +40,7 @@ public class RangeRadiusQuery {
                 if (entry.getMBR().checkOverlapFromPoint(searchPoint,pointRadius))
                 {
                     Leaf leafEntry = (Leaf) entry;
-                    qualifyingRecordIds.add(leafEntry.getRecordID());
+                    qualifyingRecordIds.add(((Leaf) entry).getData().id);
                 }
             }
         }

@@ -307,14 +307,11 @@ public class NodeEntry implements Serializable
         int n=0;
         int size = DataFile.getNofCoordinates();
         for (int i = 0; i < size; i++) {
-            if (currentMBR.getBounds().get(i).getUpper() <= searchMBR.getBounds().get(i).getUpper() && currentMBR.getBounds().get(i).getUpper() >= searchMBR.getBounds().get(i).getLower()){
+            if (currentMBR.getBounds().get(i).getUpper() <= searchMBR.getBounds().get(i).getUpper() && currentMBR.getBounds().get(i).getLower() >= searchMBR.getBounds().get(i).getLower()){
                 n++;
             }
         }
-        if (n==size)
-            return true;
-        else
-            return false;
+        return n == size;
     }
 
     /**

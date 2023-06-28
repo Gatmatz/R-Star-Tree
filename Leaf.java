@@ -32,4 +32,10 @@ public class Leaf extends NodeEntry
     {
         return recordID;
     }
+
+    public Record getData()
+    {
+        DataBlock block = DataFile.readDataFileBlock(dataBlockID);
+        return block.records.get((int)recordID);
+    }
 }

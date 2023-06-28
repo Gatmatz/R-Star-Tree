@@ -53,9 +53,9 @@ public class RStarTree
         for (int i=1;i<=DataFile.getNofBlocks();i++)
         {
             DataBlock blockn = DataFile.readDataFileBlock(i);
-            for (Record record : blockn.records)
+            for (int j=0;j<blockn.records.size();j++)
             {
-                insertData(record,i);
+                insertData(blockn.records.get(j),i,j);
             }
         }
     }
@@ -106,7 +106,7 @@ public class RStarTree
                 Bounds boundsOneD = new Bounds(record.coordinates.get(d),record.coordinates.get(d));
                 totalBounds.add(boundsOneD);
             }
-            Leaf entry = new Leaf(blockCounter, record.getId(),new MBR(totalBounds));
+            Leaf entry = new Leaf(blockCounter, recordCounter,new MBR(totalBounds));
             //Add the Leaf entry to current Node
             entries.add(entry);
             nodeIndex++;
@@ -441,14 +441,14 @@ public class RStarTree
      * @param r Record to be inserted
      * @param dataBlockID the index of dataBlock that belongs to record to be inserted.
      */
-    void insertData(Record r, int dataBlockID) throws IOException, ClassNotFoundException {
+    void insertData(Record r, int dataBlockID, int recordID) throws IOException, ClassNotFoundException {
         ArrayList<Bounds> totalBounds = new ArrayList<>();
         for (int i=0;i<DataFile.nofCoordinates;i++)
         {
             Bounds boundsOneD = new Bounds(r.coordinates.get(i),r.coordinates.get(i));
             totalBounds.add(boundsOneD);
         }
-        Leaf dummy = new Leaf(dataBlockID,r.getId(),new MBR(totalBounds));
+        Leaf dummy = new Leaf(dataBlockID,recordID,new MBR(totalBounds));
         //ID1: Invoke Insert starting with the leaf level as a parameter, to insert a new data rectangle
         recursiveInsert(null,null,dummy,LEAF_LEVEL);
     }

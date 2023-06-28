@@ -124,9 +124,9 @@ public class Preprocessor {
         else
             System.out.println("An error occurred!");
         //Convert to TXT
-        if (pre.convertToTXT(filePath,outputPath))
-            System.out.println("Successful conversion!");
-        else
-            System.out.println("An error occurred!");
+//        if (pre.convertToTXT(filePath,outputPath))
+//            System.out.println("Successful conversion!");
+//        else
+//            System.out.println("An error occurred!");
     }
 }

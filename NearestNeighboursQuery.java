@@ -157,9 +157,9 @@ public class NearestNeighboursQuery {
      * @return the record id if record exists, else return 0.
      */
     public long getRecordId(NodeEntry entry){
-        if (entry instanceof Leaf){
-            Leaf leafEntry=(Leaf) entry;
-            return ((Leaf) entry).getRecordID();
+        if (entry instanceof Leaf)
+        {
+            return ((Leaf) entry).getData().id;
         }
         return 0;
     }

@@ -75,7 +75,7 @@ public class Skyline {
         int i=0;
         for (Pair a:qualifyingRecordIds){
             Leaf leafEntry=(Leaf) a.getEntry() ;
-            System.out.println("id="+leafEntry.getRecordID());
+            System.out.println("id="+leafEntry.getData().id);
             i++;
         }
         System.out.println(i);

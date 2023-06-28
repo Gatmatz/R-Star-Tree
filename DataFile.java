@@ -18,7 +18,7 @@ public class DataFile {
         DataFile.dataFilePath = dataFilePath;
     }
 
-    public void readDatafile() throws FileNotFoundException {
+    public void readDataFile() throws FileNotFoundException {
         dataFile = new RandomAccessFile(dataFilePath, "rw"); //Create a new RAF
         DataBlock block0 = readMetaDataBlock();
         RECORD_SIZE = (int)block0.records.get(0).id;

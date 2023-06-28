@@ -37,7 +37,7 @@ public class RangeMBRQuery {
             for (NodeEntry entry: node.getEntries()) {
                 if (NodeEntry.getOverlapBoolean(entry.getMBR(), searchMBR)) {
                     Leaf leafEntry=(Leaf) entry ;
-                    qualifyingRecordIds.add(leafEntry.getRecordID());
+                    qualifyingRecordIds.add(leafEntry.getData().id);
                 }
             }
     }

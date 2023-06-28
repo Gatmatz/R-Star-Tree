@@ -1,10 +1,11 @@
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         //Make datafile
-        String csvPath = "data/map_processed.csv";
+        String csvPath = "data/data50k.csv";
         String dataFilePath = "files/datafile.txt";
         DataFile df= new DataFile(csvPath,dataFilePath);
         df.createDatafile();

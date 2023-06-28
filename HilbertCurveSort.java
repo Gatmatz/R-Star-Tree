@@ -43,7 +43,7 @@ public class HilbertCurveSort {
         FileInputStream fis = new FileInputStream(raf.getFD());
         BufferedInputStream bis = new BufferedInputStream(fis);
 
-        raf.seek((blockID-1) *DataFile.BLOCK_SIZE);
+        raf.seek((blockID) *DataFile.BLOCK_SIZE);
         byte[] block = new byte[DataFile.BLOCK_SIZE];
         bis.read(block,0,DataFile.BLOCK_SIZE);
 
@@ -97,7 +97,7 @@ public class HilbertCurveSort {
      * Function that executes a sorting of all the records of all DataBlocks in-memory.
      * The records are sorted based on their position in the Hilbert Curve.
      */
-    public static void internalSort() throws IOException {
+    public static void internalSort() throws IOException, ClassNotFoundException {
         RandomAccessFile bufferFile = new RandomAccessFile(outputFile,"rw");
         bufferFile.setLength(0);
         //Fetch all records into memory
@@ -110,6 +110,9 @@ public class HilbertCurveSort {
         }
         //Sort the records by their Hilbert Curve Value
         ArrayList<Record> sortedBuffer = sortRecords(records);
+        //Copy the metaData block to outputFile
+        DataBlock block0 = DataFile.readMetaDataBlock();
+        createBufferBlock(block0,outputFile);
         //Distribute the records to blocks
         int i = 0;
         int blockCounter = 1;
@@ -126,6 +129,7 @@ public class HilbertCurveSort {
             i++;
         }
         createBufferBlock(blockn,outputFile);
+        DataFile.dataFilePath = outputFile;
     }
 
     /**

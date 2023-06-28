@@ -8,11 +8,11 @@ public class Queries {
      */
     public void all() throws IOException, ClassNotFoundException {
 //        LinearNearestNeighbours();
-//        NearestNeighboursQuery();
+        NearestNeighboursQuery();
 //        LinearRangeQueryRadius();
-//        RangeRadiusQuery();
+        RangeRadiusQuery();
 //        LinearRangeQueryMBR();
-//        RangeMBRQuery();
+        RangeMBRQuery();
         Skyline();
     }
 
