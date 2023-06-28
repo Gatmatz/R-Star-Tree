@@ -24,12 +24,12 @@ public class RangeMBRQuery {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public void create(Node node) throws IOException, ClassNotFoundException {
+    public void search(Node node) throws IOException, ClassNotFoundException {
         //if node is not a leaf.
         if (node.getLevel()!=RStarTree.getLeafLevel()){
             for (NodeEntry entry: node.getEntries()){
                 if (NodeEntry.getOverlapBoolean(entry.getMBR(),searchMBR))
-                    create(IndexFile.readIndexBlock(entry.getChildPtr()));
+                    search(IndexFile.readIndexBlock(entry.getChildPtr()));
 
             }
             //if node is a leaf.

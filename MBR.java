@@ -66,7 +66,6 @@ public class MBR implements Serializable {
 
     /**
      * Calculates the distance between the search point and MBR for its dimension.
-     *
      * @param searchPoint the point for which I am performing a range query.
      * @return the double distance between MBR and search point.
      */

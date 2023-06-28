@@ -24,7 +24,7 @@ public class NearestNeighboursQuery {
      * Function which finds the k nearest neighbors of the search point by using a branch and bound algorithm
      * with the help of the R* Tree.
      */
-    public void nearestNeighborSearch(Node node) throws IOException, ClassNotFoundException {
+    public void search(Node node) throws IOException, ClassNotFoundException {
         //if node is not a leaf.
         if (node.getLevel()!=RStarTree.getLeafLevel()) {
             ArrayList<NodeEntry> ABL = genBranchList(node);
@@ -32,7 +32,7 @@ public class NearestNeighboursQuery {
             ABL = downwardPruning(searchPoint, ABL);
             for (int i = 0; i < ABL.size(); i++) {
                 Node newNode = IndexFile.readIndexBlock(ABL.get(i).getChildPtr());
-                nearestNeighborSearch(newNode);
+                search(newNode);
                 ABL = downwardPruning(searchPoint,ABL);
             }
         }

@@ -7,11 +7,11 @@ public class Queries {
      * Function that executes all queries and then prints out the time results.
      */
     public void all() throws IOException, ClassNotFoundException {
-//        LinearNearestNeighbours();
+        LinearNearestNeighbours();
         NearestNeighboursQuery();
-//        LinearRangeQueryRadius();
+        LinearRangeQueryRadius();
         RangeRadiusQuery();
-//        LinearRangeQueryMBR();
+        LinearRangeQueryMBR();
         RangeMBRQuery();
         Skyline();
     }
@@ -25,14 +25,16 @@ public class Queries {
         pointCoordinates.add(37.6839478);
         LinearNearestNeighbours a=new LinearNearestNeighbours(10, pointCoordinates);
         long startTime=System.nanoTime();
-        a.create();
+        a.search();
         long endTime= System.nanoTime();
         double execution=(double) (endTime - startTime) / 1000000;
         a.print();
         System.out.println("Linear Nearest Neighbours execution time: " + execution + " milliseconds");
         System.out.println();
     }
-
+    /**
+     * Prints the k nearest neighbors using R* Tree and its execution time.
+     */
     public void NearestNeighboursQuery() throws IOException, ClassNotFoundException {
         ArrayList<Double> pointCoordinates= new ArrayList<>();
         pointCoordinates.add(22.7165525);
@@ -40,21 +42,23 @@ public class Queries {
         NearestNeighboursQuery a=new NearestNeighboursQuery(10, pointCoordinates);
         long startTime=System.nanoTime();
         Node node=IndexFile.readIndexBlock(1);
-        a.nearestNeighborSearch(node);
+        a.search(node);
         long endTime = System.nanoTime();
         double execution=(double) (endTime- startTime) / 1000000;
         a.print();
         System.out.println("R* Tree Nearest Neighbours execution time: " + execution + " milliseconds");
         System.out.println();
     }
-
+    /**
+     * Prints the points which belong to the Range Query with Radius using linear search and its execution time.
+     */
     public void LinearRangeQueryRadius(){
         ArrayList<Double> pointCoordinates= new ArrayList<>();
         pointCoordinates.add(41.5031784);
         pointCoordinates.add(26.5323722);
         LinearRangeQueryRadius a=new LinearRangeQueryRadius(0.0005, pointCoordinates);
         long startTimer=System.nanoTime();
-        a.create();
+        a.search();
         long endTimer = System.nanoTime();
         double execution=(double) (endTimer - startTimer) / 1000000;
         a.print();
@@ -62,7 +66,9 @@ public class Queries {
         System.out.println("Linear Range Query Radius execution time: " + execution + " milliseconds");
         System.out.println();
     }
-
+    /**
+     * Prints the points which belong to the Range Query with Radius using R* Tree and its execution time.
+     */
     public void RangeRadiusQuery() throws IOException, ClassNotFoundException {
         ArrayList<Double> pointCoordinates= new ArrayList<>();
         pointCoordinates.add(41.5031784);
@@ -70,7 +76,7 @@ public class Queries {
         RangeRadiusQuery a=new RangeRadiusQuery(0.0005, pointCoordinates);
         long startTimer=System.nanoTime();
         Node node=IndexFile.readIndexBlock(1);
-        a.create(node);
+        a.search(node);
         long endTimer = System.nanoTime();
         double execution=(double) (endTimer - startTimer) / 1000000;
         a.print();
@@ -79,32 +85,35 @@ public class Queries {
         System.out.println();
     }
 
-
+    /**
+     * Prints the points which belong to the Range Query with MBR using linear search and its execution time.
+     */
     public void LinearRangeQueryMBR(){
-        Bounds b1= new Bounds(41.0,41.5);
-        Bounds b2= new Bounds(25.0,26.5);
+        Bounds b1= new Bounds(41.2,41.5);
+        Bounds b2= new Bounds(26.0,26.5);
         ArrayList<Bounds> BR= new ArrayList<>();
         BR.add(b1);
         BR.add(b2);
+        MBR MBR1= new MBR(BR);
         LinearRangeQueryMBR a=new LinearRangeQueryMBR(BR);
         long startTimer=System.nanoTime();
-        a.create();
+        a.search();
         long endTimer = System.nanoTime();
         double execution=(double) (endTimer - startTimer) / 1000000;
-        //a.print();
+//        a.print();
         a.printSize();
+        System.out.println("MBR's area is: "+MBR1.calculateArea());
         System.out.println("Linear Range Query Minimum Bounding Rectangle execution time: " + execution + " milliseconds");
-
-        DataBlock block0 = DataFile.readDataFileBlock(0);
-//        int nofRec = (int) block0.records.get(1).id;
-//        System.out.println(nofRec);
         System.out.println();
 
     }
 
+    /**
+     * Prints the points which belong to the Range Query with MBR using R* Tree and its execution time.
+     */
     public void RangeMBRQuery() throws IOException, ClassNotFoundException {
-        Bounds b1= new Bounds(41.0,41.5);
-        Bounds b2= new Bounds(25.0,26.5);
+        Bounds b1= new Bounds(41.2,41.5);
+        Bounds b2= new Bounds(26.0,26.5);
         ArrayList<Bounds> BR= new ArrayList<>();
         BR.add(b1);
         BR.add(b2);
@@ -112,19 +121,24 @@ public class Queries {
         RangeMBRQuery a=new RangeMBRQuery(MBR1);
         long startTimer=System.nanoTime();
         Node node=IndexFile.readIndexBlock(1);
-        a.create(node);
+        a.search(node);
         long endTimer = System.nanoTime();
         double execution=(double) (endTimer - startTimer) / 1000000;
-        //a.print();
+//        a.print();
         a.printSize();
+        System.out.println("MBR's area is: "+MBR1.calculateArea());
         System.out.println("R* Tree Range Query Minimum Bounding Rectangle execution time: " + execution + " milliseconds");
+        System.out.println();
     }
 
+    /**
+     * Prints the points which belong to the Skyline using R* Tree and its execution time.
+     */
     public void Skyline() throws IOException, ClassNotFoundException {
         Skyline s=new Skyline();
         long startTimer=System.nanoTime();
         Node node=IndexFile.readIndexBlock(1);
-        s.skylineSearch(node);
+        s.search(node);
         long endTimer = System.nanoTime();
         double execution=(double) (endTimer - startTimer) / 1000000;
         s.print();

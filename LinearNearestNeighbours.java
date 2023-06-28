@@ -25,10 +25,9 @@ public class LinearNearestNeighbours implements Serializable {
      * It examines all the blocks and all their records to find the closest points.
      * With linear search.
      */
-    public void create(){
+    public void search(){
         DataBlock block0 = DataFile.readDataFileBlock(0);
         int nofBlocks = (int) block0.records.get(2).id;
-        //System.out.println(nofBlocks);
         int blockId = 1;
         int counter=0;
         while(blockId <= nofBlocks) {

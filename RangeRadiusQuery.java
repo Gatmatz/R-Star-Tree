@@ -27,18 +27,17 @@ public class RangeRadiusQuery {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public void create(Node node) throws IOException, ClassNotFoundException {
+    public void search(Node node) throws IOException, ClassNotFoundException {
         if (node.getLevel()!=RStarTree.getLeafLevel()) {
             for (NodeEntry entry : node.getEntries()) {
                 if (entry.getMBR().checkOverlapFromPoint(searchPoint, pointRadius)) {
                     if (IndexFile.readIndexBlock(entry.getChildPtr())!=null)
-                        create(IndexFile.readIndexBlock(entry.getChildPtr()));
+                        search(IndexFile.readIndexBlock(entry.getChildPtr()));
                 }
             }
         }else{
             for (NodeEntry entry: node.getEntries()){
-                if (entry.getMBR().checkOverlapFromPoint(searchPoint,pointRadius))
-                {
+                if (entry.getMBR().checkOverlapFromPoint(searchPoint,pointRadius)) {
                     Leaf leafEntry = (Leaf) entry;
                     qualifyingRecordIds.add(((Leaf) entry).getData().id);
                 }

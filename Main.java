@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Main {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         //Make datafile
-        String csvPath = "data/data50k.csv";
+        String csvPath = "data/map_processed.csv";
         String dataFilePath = "files/datafile.txt";
         DataFile df= new DataFile(csvPath,dataFilePath);
         df.createDatafile();
@@ -15,6 +15,8 @@ public class Main {
         RStarTree tree = new RStarTree();
 //        RStarTree.bulkLoad();
         tree.insertLinear();
+        Queries q = new Queries();
+        q.all();
     }
     public static void testNoEntries() throws IOException, ClassNotFoundException {
         System.out.println(DataFile.getNofBlocks());
