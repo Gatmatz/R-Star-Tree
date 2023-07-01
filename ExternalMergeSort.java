@@ -4,10 +4,11 @@ import java.util.*;
 /**
  * Java Class that contains all the tools to sort a DataFile using the HilbertCurve.
  */
-public class HilbertCurveSort {
+public class ExternalMergeSort {
     public static long noOfBlocks=DataFile.getNofBlocks();
     public static String outputFile = "files/externalSort.txt";
     public static String tempFile = "files/externalSort.tmp";
+
     /**
      *  Function that serializes an object.
      * @param nblock Object class to be serialized
@@ -69,19 +70,23 @@ public class HilbertCurveSort {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Startup function that executes an external merge sort in the leaves.
+     */
     public static void externalSort() throws IOException, ClassNotFoundException {
         //Delete previous sorting
         RandomAccessFile bufferFile = new RandomAccessFile(outputFile,"rw");
         bufferFile.setLength(0);
         //Initialize new external Merge-Sort
-        for (int i=1;i<=DataFile.getNofBlocks();i++)
+        for (int i=0;i<=DataFile.getNofBlocks();i++)
         {
             DataBlock blockn = DataFile.readDataFileBlock(i);
             sortAndWriteBuffer(blockn.records,i);
         }
-        // Merge sorted temporary files
+        // Merge sorted temporary blocks
         mergeBlocks();
-        //Delete temporary files
+        //Delete temporary file
         try
         {
             File file = new File(tempFile);
@@ -163,101 +168,90 @@ public class HilbertCurveSort {
             result.add(entry.getKey());
         return result;
     }
+
+    /**
+     * Auxiliary function that sorts an ArrayList of Records and then put records in a DataBlock.
+     * Finally, it stores the DataBlock to a temporary file.
+     * @param buffer the ArrayList of records to be sorted and saved.
+     * @param counter the blockID of the block to be saved.
+     */
     private static void sortAndWriteBuffer(ArrayList<Record> buffer, int counter) {
-        ArrayList<Record> sortedBuffer = sortRecords(buffer);
+        ArrayList<Record> sortedBuffer = buffer;
+        //If block is referred to block0 then don't sort
+        if (counter !=0 )
+        {
+            sortedBuffer = sortRecords(buffer);
+        }
+        //Create a new DataBlock with the sorted Records
         DataBlock blockn = new DataBlock(counter);
         blockn.records = new ArrayList<>(sortedBuffer);
         createBufferBlock(blockn,tempFile);
     }
 
+    /**
+     * Auxiliary function that performs a k-way merge, where k is number of blocks-1.
+     */
     private static void mergeBlocks() throws IOException, ClassNotFoundException {
+        //if DataFile is empty
         if (noOfBlocks == 0)
             return;
+        //if DataFile has only one block
         else if (noOfBlocks == 1)
         {
+            //Copy the metaData block to outputFile
+            DataBlock block0 = readBufferBlock(0,tempFile);
+            createBufferBlock(block0,outputFile);
+            //Write the one block to the outputFile
             DataBlock outputBlock = readBufferBlock(1,tempFile);
             createBufferBlock(outputBlock,outputFile);
             return;
         }
-        int counterA = 1;
-        int counterB = 2;
-        int counterC = 1;
-        DataBlock blockA = readBufferBlock(counterA,tempFile);
-        DataBlock blockB = readBufferBlock(counterB,tempFile);
-        DataBlock outputBlock = new DataBlock(counterC);
-        int indexA = 0;
-        int indexB = 0;
-        long maxRecords = blockA.getNofRecords();
-        while (counterA <= noOfBlocks && counterB <= noOfBlocks)
+        int nofRecords = DataFile.readDataFileBlock(1).records.size();
+        //Initialize a priority heap that keeps the minimum record from each DataBlock
+        PriorityQueue<RecordInfo> minHeap = new PriorityQueue<>();
+        //Insert into the heap the minimum record from each DataBlock
+        for (int i=1;i<=noOfBlocks;i++) {
+            DataBlock block = ExternalMergeSort.readBufferBlock(i,tempFile);
+            Record minRecord = block.records.get(0);
+            RecordInfo p = new RecordInfo(minRecord,i,0);
+            minHeap.offer(p);
+        }
+        //Copy the block0 to the outputFile.
+        DataBlock block0 = readBufferBlock(0,tempFile);
+        createBufferBlock(block0,outputFile);
+        //Execute the k-way merge
+        int counter = 1;
+        DataBlock block=new DataBlock(counter);
+        while (!minHeap.isEmpty())
         {
-            while (indexA < blockA.getNofRecords() && indexB < blockB.getNofRecords()) {
-                Record record1 = blockA.records.get(indexA);
-                Record record2 = blockB.records.get(indexB);
-
-                if (record1.getHilbertValue() < record2.getHilbertValue())
-                {
-                    outputBlock.addRecord(record1);
-                    indexA++;
-                } else {
-                    outputBlock.addRecord(record2);
-                    indexB++;
-                }
-
-                if (outputBlock.getNofRecords() >= maxRecords)
-                {
-                    createBufferBlock(outputBlock,outputFile);
-                    counterC++;
-                    outputBlock = new DataBlock(counterC);
-                }
-            }
-            if (indexA>=blockA.getNofRecords())
+            //Take out the minimum record
+            RecordInfo rp = minHeap.poll();
+            //Check if current block is full
+            if (block.records.size()>=nofRecords)
             {
-                counterA = Math.max(counterA,counterB) + 1;
-                if (counterA > noOfBlocks)
-                    break;
-                blockA = readBufferBlock(counterA,tempFile);
-                indexA = 0;
+                //Write the full block to memory and initialize a new one
+                createBufferBlock(block,outputFile);
+                counter++;
+                //and initialize a new one
+                block = new DataBlock(counter);
             }
-            else if (indexB>=blockB.getNofRecords())
+            //Add the record to the block
+            block.addRecord(rp.record);
+            //Fetch the record's block
+            DataBlock current = ExternalMergeSort.readBufferBlock(rp.blockID,tempFile);
+            //Find the index of the record and move it to the next one
+            int index = rp.index + 1;
+            //If the index is in the bounds of the block
+            if (index<current.records.size())
             {
-                counterB = Math.max(counterA,counterB) + 1;
-                if (counterB > noOfBlocks)
-                    break;
-                blockB = readBufferBlock(counterB,tempFile);
-                indexB = 0;
+                //Insert into the heap the next minimum record of current block
+                Record minRecord = current.records.get(index);
+                RecordInfo p = new RecordInfo(minRecord,rp.blockID, index);
+                minHeap.offer(p);
             }
         }
-        if (indexA < blockA.getNofRecords())
-        {
-            while (indexA < blockA.getNofRecords())
-            {
-                if (outputBlock.getNofRecords() >= maxRecords)
-                {
-                    createBufferBlock(outputBlock,outputFile);
-                    counterC++;
-                    outputBlock = new DataBlock(counterC);
-                }
-                Record record1 = blockA.records.get(indexA);
-                outputBlock.addRecord(record1);
-                indexA++;
-            }
-        }
-        else if (indexB < blockB.getNofRecords())
-        {
-            while (indexB < blockB.getNofRecords())
-            {
-                if (outputBlock.getNofRecords() >= maxRecords)
-                {
-                    createBufferBlock(outputBlock,outputFile);
-                    counterC++;
-                    outputBlock = new DataBlock(counterC);
-                }
-                Record record2 = blockB.records.get(indexB);
-                outputBlock.addRecord(record2);
-                indexB++;
-            }
-        }
-        createBufferBlock(outputBlock,outputFile);
+        //Save the last DataBlock to the outputFile
+        createBufferBlock(block,outputFile);
     }
 
     /**
@@ -274,5 +268,60 @@ public class HilbertCurveSort {
             blocks.add(dummy);
         }
         return blocks;
+    }
+}
+
+/**
+ * Auxiliary class that represents a record with additional information about its HilbertCurve value, its DataBlock
+ * and its index in the DataBlock.
+ */
+class RecordInfo implements Comparable<RecordInfo>{
+    public Record record;
+    public double hValue; //The HilbertCurve of the Record
+    public int blockID; //The DataBlock index in which the record is saved
+    public int index; //The index of the DataBlock array in which the record is saved
+
+    /**
+     * Constructor that takes a record, its blockID and its index in the block,
+     * calculates its HilbertCurve value and saves the information to the class.
+     * @param record the record to be represented
+     * @param blockID the block that the record is saved
+     * @param index the index in the block that the record is saved
+     */
+    public RecordInfo(Record record, int blockID, int index) {
+        this.record=record;
+        this.hValue = record.getHilbertValue();
+        this.blockID = blockID;
+        this.index = index;
+    }
+
+    /**
+     * Getter that returns the HilbertCurve value of the record
+     * @return the HilbertCurve value of the record
+     */
+    public double gethValue() {
+        return hValue;
+    }
+
+    /**
+     * Getter that returns the record
+     * @return the record
+     */
+    public Record getRecord() {
+        return record;
+    }
+
+    /**
+     * Getter that returns the blockID of the record
+     * @return the blockID of the record
+     */
+    public int getBlockID()
+    {
+        return blockID;
+    }
+
+    @Override
+    public int compareTo(RecordInfo o) {
+        return Double.compare(this.hValue,o.hValue);
     }
 }

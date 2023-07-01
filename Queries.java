@@ -21,8 +21,8 @@ public class Queries {
      */
     public void LinearNearestNeighbours(){
         ArrayList<Double> pointCoordinates= new ArrayList<>();
-        pointCoordinates.add(22.7165525);
-        pointCoordinates.add(37.6839478);
+        pointCoordinates.add(40.6872005);
+        pointCoordinates.add(22.8488031);
         LinearNearestNeighbours a=new LinearNearestNeighbours(10, pointCoordinates);
         long startTime=System.nanoTime();
         a.search();
@@ -37,8 +37,8 @@ public class Queries {
      */
     public void NearestNeighboursQuery() throws IOException, ClassNotFoundException {
         ArrayList<Double> pointCoordinates= new ArrayList<>();
-        pointCoordinates.add(22.7165525);
-        pointCoordinates.add(37.6839478);
+        pointCoordinates.add(40.6872005);
+        pointCoordinates.add(22.8488031);
         NearestNeighboursQuery a=new NearestNeighboursQuery(10, pointCoordinates);
         long startTime=System.nanoTime();
         Node node=IndexFile.readIndexBlock(1);
@@ -54,8 +54,8 @@ public class Queries {
      */
     public void LinearRangeQueryRadius(){
         ArrayList<Double> pointCoordinates= new ArrayList<>();
-        pointCoordinates.add(41.5031784);
-        pointCoordinates.add(26.5323722);
+        pointCoordinates.add(40.6872005);
+        pointCoordinates.add(22.8488031);
         LinearRangeQueryRadius a=new LinearRangeQueryRadius(0.0005, pointCoordinates);
         long startTimer=System.nanoTime();
         a.search();
@@ -71,8 +71,8 @@ public class Queries {
      */
     public void RangeRadiusQuery() throws IOException, ClassNotFoundException {
         ArrayList<Double> pointCoordinates= new ArrayList<>();
-        pointCoordinates.add(41.5031784);
-        pointCoordinates.add(26.5323722);
+        pointCoordinates.add(40.6872005);
+        pointCoordinates.add(22.8488031);
         RangeRadiusQuery a=new RangeRadiusQuery(0.0005, pointCoordinates);
         long startTimer=System.nanoTime();
         Node node=IndexFile.readIndexBlock(1);

@@ -59,20 +59,19 @@ public class RStarTree
             }
         }
     }
-
     /**
      * Auxiliary function that bulk-loads the records from the datafile to leaves.
      */
     private static void bulkLoadLeaves() throws IOException, ClassNotFoundException {
         int comfortSize = (Node.maxEntries*80)/100;
         //Sort the DataBlocks from the DataFile and save them to externalSort.txt
-        HilbertCurveSort.internalSort();
+        ExternalMergeSort.externalSort();
         //Initialize counters for the filling of the Leafs
         int blockCounter = 1; //keeps track of the blocks in the Datafile
         int recordCounter = 0; //keeps track of the records in a specific DataBlock
         int nodeCounter = 1; //keeps track of the blocks in the IndexFile
         int nodeIndex = 0; //keeps track of the records in a specific Node in the indexFile
-        DataBlock blockn = HilbertCurveSort.readBufferBlock(blockCounter,"files/externalSort.txt");
+        DataBlock blockn = ExternalMergeSort.readBufferBlock(blockCounter,"files/externalSort.txt");
         ArrayList<NodeEntry> entries = new ArrayList<>();
         while (blockCounter <=DataFile.getNofBlocks())
         {
@@ -95,7 +94,7 @@ public class RStarTree
                 blockCounter++;
                 if (blockCounter > DataFile.getNofBlocks())
                     break;
-                blockn = HilbertCurveSort.readBufferBlock(blockCounter,"files/externalSort.txt");
+                blockn = ExternalMergeSort.readBufferBlock(blockCounter,"files/externalSort.txt");
                 recordCounter=0;
             }
             //Create an appropriate Leaf for each record
@@ -660,23 +659,25 @@ public class RStarTree
                     //Entries from eliminated leaf nodes are re-inserted in tree leaves, but entries from higher level
                     //nodes must be placed higher in the tree, so that leaves of their dependent subtrees will be on
                     //the same level as leaves of the main tree
-                    if (childNode.getEntries().size()<Node.minEntries)
+                    if (childNode!=null)
                     {
-                        parent.getEntries().remove(childEntry);
-                        for (NodeEntry entry : childNode.getEntries())
+                        if (childNode.getEntries().size()<Node.minEntries)
                         {
-                            recursiveInsert(null,null,entry,childNode.getLevel());
+                            parent.getEntries().remove(childEntry);
+                            for (NodeEntry entry : childNode.getEntries())
+                            {
+                                recursiveInsert(null,null,entry,childNode.getLevel());
+                            }
                         }
+                        //If N has not been eliminated, adjust EnI to tightly contain all entries in N.
+                        else
+                        {
+                            childEntry.fitEntries(childNode.getEntries());
+                        }
+                        IndexFile.updateIndexBlock(parent.getBlockID(),parent);
+                        return parent;
                     }
-                    //If N has not been eliminated, adjust EnI to tightly contain all entries in N.
-                    else
-                    {
-                        childEntry.fitEntries(childNode.getEntries());
-                    }
-                    IndexFile.updateIndexBlock(parent.getBlockID(),parent);
-                    return parent;
                 }
-
             }
         }
         //[Search leaf node for record]
