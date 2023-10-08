@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Main {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         //Make datafile
-        String csvPath = "data/small_processed.csv";
+        String csvPath = "data/data8342.csv";
         String dataFilePath = "files/datafile.txt";
         DataFile df= new DataFile(csvPath,dataFilePath);
         df.createDatafile();
