@@ -23,7 +23,7 @@ The bounds class represent a side of the MBR (Minimum Bounding Rectangle).
 ### Minimum Bounding Rectangle
 The MBR class represent a Minimum Bounding Rectangle as defined in the paper [1].
 
-![mbr](pictures/mbr.png)
+![mbr](pictures/MBR_image.png)
 
 ### Record
 The Record class represent a Record from the initial dataset, which has an id and a set of coordinates.
