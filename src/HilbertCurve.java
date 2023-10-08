@@ -1,3 +1,5 @@
+package src;
+
 /**
  * Java Class that contains all required tools to implement a Hilbert Curve.
  * The Hilbert curve is a continuous fractal space-filling curve.

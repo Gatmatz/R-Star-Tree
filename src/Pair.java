@@ -1,3 +1,5 @@
+package src;
+
 import java.util.Comparator;
 
 public class Pair implements Comparable<Pair>{

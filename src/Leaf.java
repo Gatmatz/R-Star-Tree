@@ -1,3 +1,5 @@
+package src;
+
 /**
  * Java Class that represents a leaf node in the R*-Tree.
  * Based on R*-tree implementation a leaf node has a minimum bounding rectangle of object(extended from NodeEntry) and

@@ -1,3 +1,5 @@
+package src;
+
 public class NearestNeighboursInfo {
     public long recordId;
     public double minDistance;

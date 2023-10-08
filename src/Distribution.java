@@ -1,3 +1,5 @@
+package src;
+
 /**
  * Java Class that represents a distribution of a Node into two Groups(A and B) after a split.
  */
